@@ -1,11 +1,9 @@
 package eu.veldsoft.ellipses.image.approximator;
 
+import java.awt.BasicStroke;
 import java.awt.Color;
-import java.awt.Graphics;
 import java.awt.Graphics2D;
-import java.awt.Shape;
-import java.awt.geom.AffineTransform;
-import java.awt.geom.Ellipse2D;
+import java.awt.geom.Line2D;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
@@ -14,6 +12,9 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Random;
 import java.util.Vector;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
 
 import javax.imageio.ImageIO;
 
@@ -22,27 +23,41 @@ class Util {
 }
 
 class Ellipse {
-	int x;
-	int y;
-	int width;
-	int height;
-	double theta;
-	Color color;
+	static int width;
+	static int height;
 
-	public Ellipse(int x, int y, int width, int height, double theta,
-			Color color) {
+	int x1;
+	int y1;
+	int x2;
+	int y2;
+	Color color;
+	Line2D line;
+
+	void setup(int x, int y, double theta) {
+		x1 = (int) (width * Math.cos(theta + Math.PI) / 2.0D + x);
+		y1 = (int) (width * Math.sin(theta + Math.PI) / 2.0D + y);
+		x2 = (int) (width * Math.cos(theta) / 2.0D + x);
+		y2 = (int) (width * Math.sin(theta) / 2.0D + y);
+
+		line.setLine(x1, y1, x2, y2);
+	}
+
+	public Ellipse(int x, int y, double theta, Color color) {
 		super();
-		this.x = x;
-		this.y = y;
-		this.width = width;
-		this.height = height;
-		this.theta = theta;
+
 		this.color = color;
+		line = new Line2D.Double(0, 0, 0, 0);
+
+		setup(x, y, theta);
 	}
 
 	public Ellipse(Ellipse ellipse) {
-		this(ellipse.x, ellipse.y, ellipse.width, ellipse.height,
-				ellipse.theta, ellipse.color);
+		x1 = ellipse.x1;
+		y1 = ellipse.y1;
+		x2 = ellipse.x2;
+		y2 = ellipse.y2;
+		color = ellipse.color;
+		line = new Line2D.Double(x1, y1, x2, y2);
 	}
 
 }
@@ -56,6 +71,13 @@ class Chromosome {
 		this.ellipses = ellipses;
 		this.fittnes = fittnes;
 	}
+
+	public Chromosome(Chromosome chromosome) {
+		this.fittnes = chromosome.fittnes;
+		for (Ellipse e : chromosome.ellipses) {
+			ellipses.addElement(new Ellipse(e));
+		}
+	}
 }
 
 class Population {
@@ -67,11 +89,45 @@ class Population {
 	private Vector<Chromosome> chromosomes = new Vector<Chromosome>();
 	private BufferedImage image = null;
 	private BufferedImage experimental = null;
+	private Map<Color, Integer> histogram = new HashMap<Color, Integer>();
+
+	public Population(Population population) {
+		super();
+
+		this.first = null;
+		this.second = null;
+		this.offspring = null;
+		this.result = null;
+		this.image = population.image;
+		this.experimental = null;
+		this.best = population.best;
+		this.chromosomes = new Vector<Chromosome>();
+		this.histogram = population.histogram;
+
+		for (Chromosome c : population.chromosomes) {
+			chromosomes.add(new Chromosome(c));
+		}
+	}
 
 	public Population(int size, BufferedImage image) {
 		super();
 
 		this.image = image;
+
+		/*
+		 * Calculate the most used colors from the original picture.
+		 */
+		int pixels[] = image.getRGB(0, 0, image.getWidth(), image.getHeight(),
+				null, 0, image.getWidth());
+		for (int i = 0; i < pixels.length; i++) {
+			Color color = Main.closestColor(new Color(pixels[i]));
+
+			if (histogram.containsKey(color) == false) {
+				histogram.put(color, 1);
+			} else {
+				histogram.put(color, histogram.get(color) + 1);
+			}
+		}
 
 		/*
 		 * At least 4 chromosomes are needed in order the algorithm to work.
@@ -196,10 +252,10 @@ class Population {
 
 		int dx = (int) (e.width * factor);
 		int dy = (int) (e.height * factor);
-		double dtheta = e.theta * factor;
+		double theta = 2 * Math.PI * Util.PRNG.nextDouble();
 
 		/*
-		 * Mutate color in some cases.
+		 * Mutate color in some cases by taking color of other ellipse.
 		 */
 		if (Util.PRNG.nextDouble() < factor) {
 			e.color = offspring.ellipses.get(Util.PRNG
@@ -207,59 +263,37 @@ class Population {
 		}
 
 		/*
-		 * Mutate rotation.
-		 */
-		e.theta += dtheta;
-		if (e.theta > 2 * Math.PI) {
-			e.theta -= 2 * Math.PI;
-		}
-
-		/*
 		 * Mutate positions.
 		 */
 		if (Util.PRNG.nextBoolean() == true) {
-			e.x -= dx;
+			e.x1 -= dx;
 		} else {
-			e.x += dx;
+			e.x1 += dx;
 		}
 		if (Util.PRNG.nextBoolean() == true) {
-			e.y -= dy;
+			e.y1 -= dy;
 		} else {
-			e.y += dy;
+			e.y1 += dy;
 		}
 
 		/*
-		 * Ellipse should not be outside of the image.
+		 * Mutate rotation.
 		 */
-		if (e.x < 0) {
-			e.x = 0;
-		}
-		if (e.y < 0) {
-			e.y = 0;
-		}
-		if (e.x >= image.getWidth() - e.width) {
-			e.x = image.getWidth() - e.width - 1;
-		}
-		if (e.y >= image.getHeight() - e.height) {
-			e.y = image.getHeight() - e.height - 1;
+		e.setup((int) ((e.x1 + e.x2) / 2.0), (int) ((e.y1 + e.y2) / 2.0), theta);
+
+		// TODO Ellipse should not be outside of the image.
+		if (e.x1 < 0 || e.y1 < 0 || e.x2 < 0 || e.y2 < 0
+				|| e.x1 >= image.getWidth() || e.y1 >= image.getHeight()
+				|| e.x2 >= image.getWidth() || e.y2 >= image.getHeight()) {
+			e.setup((int) (image.getWidth() / 2.0),
+					(int) (image.getHeight() / 2.0), theta);
 		}
 	}
 
 	void evaluate() {
 		/*
-		 * The most used colors should be drawn first.
-		 */
-		Map<Color, Integer> histogram = new HashMap<Color, Integer>();
-		for (Ellipse e : offspring.ellipses) {
-			if (histogram.containsKey(e.color) == false) {
-				histogram.put(e.color, 1);
-			} else {
-				histogram.put(e.color, histogram.get(e.color) + 1);
-			}
-		}
-
-		/*
-		 * Sort according color usage and x-y coordinates.
+		 * Sort according color usage and x-y coordinates. The most used colors
+		 * should be drawn first.
 		 */
 		for (int i = 0; i < offspring.ellipses.size(); i++) {
 			for (int j = i + 1; j < offspring.ellipses.size(); j++) {
@@ -269,7 +303,7 @@ class Population {
 				if (histogram.get(a.color) < histogram.get(b.color)) {
 					Collections.swap(offspring.ellipses, i, j);
 				} else if (histogram.get(a.color) == histogram.get(b.color)) {
-					if (a.x * a.x + a.y * a.y > b.x * b.x + b.y * b.y) {
+					if (a.x1 * a.x1 + a.y1 * a.y1 > b.x1 * b.x1 + b.y1 * b.y1) {
 						Collections.swap(offspring.ellipses, i, j);
 					}
 				}
@@ -296,7 +330,7 @@ class Population {
 
 		if (result.fittnes < best.fittnes) {
 			best = result;
-			
+
 			/*
 			 * Only for optimization progress report.
 			 */
@@ -304,8 +338,10 @@ class Population {
 				@Override
 				public void run() {
 					try {
-						ImageIO.write(experimental, "png",
-								new File("" + System.currentTimeMillis() + ".png"));
+						synchronized (experimental) {
+							ImageIO.write(experimental, "png", new File(""
+									+ System.currentTimeMillis() + ".png"));
+						}
 					} catch (IOException e) {
 					}
 				}
@@ -314,10 +350,36 @@ class Population {
 	}
 }
 
+class Task implements Runnable {
+	private long evaluations;
+	private Population population;
+
+	public Task(long evaluations, Population population) {
+		super();
+		this.evaluations = evaluations;
+		this.population = population;
+	}
+
+	@Override
+	public void run() {
+		for (long g = evaluations; g >= 0; g--) {
+			population.select();
+			population.crossover();
+			population.mutate();
+			population.evaluate();
+			population.survive();
+			try {
+				Thread.currentThread().sleep(100);
+			} catch (InterruptedException e) {
+			}
+		}
+	}
+}
+
 public class Main {
+	private static int DEFAULT_THREAD_POOL_SIZE = 1;
+
 	private static BufferedImage original = null;
-	private static int ellipseWidth = 0;
-	private static int ellipseHeight = 0;
 	private static Vector<Color> colors = new Vector<Color>();
 
 	private static double distance(Color a, Color b) {
@@ -332,7 +394,7 @@ public class Main {
 				+ weightBlue * blue * blue);
 	}
 
-	private static Color closestColor(Color color) {
+	static Color closestColor(Color color) {
 		if (colors.size() <= 0) {
 			return color;
 		}
@@ -351,25 +413,28 @@ public class Main {
 	static double alphaLevel(BufferedImage image) {
 		double level = 0;
 
-		for (int i = 0; i < image.getWidth(); i++) {
-			for (int j = 0; j < image.getHeight(); j++) {
-				if (colors.contains(new Color(image.getRGB(i, j))) == false) {
-					level++;
-				}
+		int pixels[] = image.getRGB(0, 0, image.getWidth(), image.getHeight(),
+				null, 0, image.getWidth());
+		for (int i = 0; i < pixels.length; i++) {
+			if (colors.contains(new Color(pixels[i])) == false) {
+				level++;
 			}
 		}
 
-		return level / (image.getWidth() * image.getHeight());
+		return level / pixels.length;
 	}
 
 	static double distance(BufferedImage a, BufferedImage b) {
 		double result = 0;
 
-		for (int i = 0; i < a.getWidth() && i < b.getWidth(); i++) {
-			for (int j = 0; j < a.getHeight() && j < b.getHeight(); j++) {
-				result += distance(new Color(a.getRGB(i, j)),
-						new Color(b.getRGB(i, j)));
-			}
+		int aPixels[] = a.getRGB(0, 0, a.getWidth(), a.getHeight(), null, 0,
+				a.getWidth());
+
+		int bPixels[] = b.getRGB(0, 0, b.getWidth(), b.getHeight(), null, 0,
+				b.getWidth());
+
+		for (int i = 0; i < aPixels.length && i < bPixels.length; i++) {
+			result += distance(new Color(aPixels[i]), new Color(bPixels[i]));
 		}
 
 		return result;
@@ -378,18 +443,12 @@ public class Main {
 	static BufferedImage drawEllipses(BufferedImage image,
 			Vector<Ellipse> ellipses) {
 		Graphics2D graphics = (Graphics2D) image.getGraphics();
+		graphics.setStroke(new BasicStroke(Ellipse.height,
+				BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND));
 
-		for (Ellipse ellipse : ellipses) {
-			Shape ellipse1 = new Ellipse2D.Double(-ellipse.width / 2,
-					-ellipse.height / 2, ellipse.width, ellipse.height);
-			Shape ellipse2 = AffineTransform.getRotateInstance(ellipse.theta)
-					.createTransformedShape(ellipse1);
-			Shape ellipse3 = AffineTransform.getTranslateInstance(ellipse.x,
-					ellipse.y).createTransformedShape(ellipse2);
-
-			graphics.setColor(ellipse.color);
-			graphics.setBackground(ellipse.color);
-			graphics.fill(ellipse3);
+		for (Ellipse e : ellipses) {
+			graphics.setColor(e.color);
+			graphics.draw(e.line);
 		}
 
 		return image;
@@ -399,21 +458,20 @@ public class Main {
 		Vector<Ellipse> ellipses = new Vector<Ellipse>();
 
 		int numberOfEllipses = (int) ((4 * image.getWidth() * image.getHeight()) / (Math.PI
-				* ellipseWidth * ellipseHeight));
+				* Ellipse.width * Ellipse.height));
 
 		/*
 		 * It is not clear why this multiplication is needed.
 		 */
 		numberOfEllipses *= 1.0D + 3.0D * Util.PRNG.nextDouble();
 
-		for (int i = 0; i < numberOfEllipses; i++) {
-			int x = Util.PRNG.nextInt(image.getWidth());
-			int y = Util.PRNG.nextInt(image.getHeight());
+		for (int i = 0, x, y; i < numberOfEllipses; i++) {
+			x = Util.PRNG.nextInt(image.getWidth());
+			y = Util.PRNG.nextInt(image.getHeight());
 			Color color = closestColor(new Color(image.getRGB(x, y)));
 			double theta = 2.0D * Math.PI * Util.PRNG.nextDouble();
 
-			ellipses.add(new Ellipse(x, y, ellipseWidth, ellipseHeight, theta,
-					color));
+			ellipses.add(new Ellipse(x, y, theta, color));
 		}
 
 		return ellipses;
@@ -422,8 +480,8 @@ public class Main {
 	public static void main(String[] args) throws Exception {
 		original = ImageIO.read(new File(args[0]));
 
-		ellipseWidth = Integer.valueOf(args[3]);
-		ellipseHeight = Integer.valueOf(args[4]);
+		Ellipse.width = Integer.valueOf(args[3]);
+		Ellipse.height = Integer.valueOf(args[4]);
 
 		for (int i = 5; i < args.length; i++) {
 			colors.add(new Color(Integer.parseInt(args[i], 16)));
@@ -441,16 +499,22 @@ public class Main {
 								.getHeight(), BufferedImage.TYPE_INT_ARGB),
 						population.best.ellipses), "png",
 				new File("" + System.currentTimeMillis() + ".png"));
-		
-		for (long g = Long.valueOf(args[2]); g >= 0; g--) {
-			population.select();
-			population.crossover();
-			population.mutate();
-			population.evaluate();
-			population.survive();
-			Thread.currentThread().sleep(100);
-			System.out.println( g );
+		System.out.println("Optimization start ...");
+
+		int totalEvaluations = Integer.valueOf(args[2]);
+
+		ThreadPoolExecutor executor = (ThreadPoolExecutor) Executors
+				.newFixedThreadPool(DEFAULT_THREAD_POOL_SIZE);
+
+		for (int i = 1; i < DEFAULT_THREAD_POOL_SIZE; i++) {
+			executor.execute(new Task(totalEvaluations
+					/ DEFAULT_THREAD_POOL_SIZE, new Population(population)));
 		}
+		executor.execute(new Task(totalEvaluations / DEFAULT_THREAD_POOL_SIZE
+				+ totalEvaluations % DEFAULT_THREAD_POOL_SIZE, population));
+
+		executor.shutdown();
+		executor.awaitTermination(1000, TimeUnit.DAYS);
 
 		/*
 		 * Report result.
@@ -461,5 +525,6 @@ public class Main {
 								.getHeight(), BufferedImage.TYPE_INT_ARGB),
 						population.best.ellipses), "png",
 				new File("" + System.currentTimeMillis() + ".png"));
+		System.out.println("Optimization end ...");
 	}
 }
