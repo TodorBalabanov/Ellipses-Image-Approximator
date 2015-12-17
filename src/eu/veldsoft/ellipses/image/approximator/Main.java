@@ -373,9 +373,12 @@ class Population {
 
 		// TODO Number of ellipses and images distance can be used with some
 		// coefficients.
-		offspring.fittnes = 10D * offspring.ellipses.size() + 60D
-				* Main.distance(image, experimental) + 30D
-				* Main.alphaLevel(experimental);
+		double size = offspring.ellipses.size();
+		double distance = Main.distance(image, experimental);
+		double alpha = Main.alphaLevel(experimental);
+		offspring.fittnes = 0.1D * size + 0.6D
+				* distance * distance * distance + 0.3D
+				* alpha * alpha;
 	}
 
 	void survive() {
