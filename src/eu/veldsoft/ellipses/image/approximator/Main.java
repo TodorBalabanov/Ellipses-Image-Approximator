@@ -18,6 +18,60 @@ import java.util.concurrent.TimeUnit;
 
 import javax.imageio.ImageIO;
 
+interface ColorComparator {
+	public double distance(Color a, Color b);
+}
+
+class HSVColorComparator implements ColorComparator {
+	private double meanRed;
+	private int deltaRed;
+	private int deltaGreen;
+	private int deltaBlue;
+	private double weightRed;
+	private double weightGreen;
+	private double weightBlue;
+
+	public double distance(Color a, Color b) {
+		meanRed = (a.getRed() + b.getRed()) / 2;
+
+		deltaRed = a.getRed() - b.getRed();
+		deltaGreen = a.getGreen() - b.getGreen();
+		deltaBlue = a.getBlue() - b.getBlue();
+
+		weightRed = 2 + meanRed / 256;
+		weightGreen = 4.0;
+		weightBlue = 2 + (255 - meanRed) / 256;
+
+		// TODO return Math.sqrt(weightRed * red * red + weightGreen * green *
+		// green + weightBlue * blue * blue);
+		return (weightRed * deltaRed * deltaRed + weightGreen * deltaGreen
+				* deltaGreen + weightBlue * deltaBlue * deltaBlue);
+	}
+}
+
+class EuclideanColorComparator implements ColorComparator {
+	private double deltaRed;
+	private double deltaGreen;
+	private double deltaBlue;
+
+	public double distance(Color a, Color b) {
+		deltaRed = a.getRed() - b.getRed();
+		deltaGreen = a.getGreen() - b.getGreen();
+		deltaBlue = a.getBlue() - b.getBlue();
+
+		// TODO return Math.sqrt(deltaRed * deltaRed + deltaGreen * deltaGreen +
+		// deltaBlue * deltaBlue);
+		return (deltaRed * deltaRed + deltaGreen * deltaGreen + deltaBlue
+				* deltaBlue);
+	}
+}
+
+class HausdorffColorComparator implements ColorComparator {
+	public double distance(Color a, Color b) {
+		return 0.0;
+	}
+}
+
 class Util {
 	public static final Random PRNG = new Random();
 }
@@ -381,18 +435,7 @@ public class Main {
 
 	private static BufferedImage original = null;
 	private static Vector<Color> colors = new Vector<Color>();
-
-	private static double distance(Color a, Color b) {
-		double rmean = (a.getRed() + b.getRed()) / 2;
-		int red = a.getRed() - b.getRed();
-		int green = a.getGreen() - b.getGreen();
-		int blue = a.getBlue() - b.getBlue();
-		double weightRed = 2 + rmean / 256;
-		double weightGreen = 4.0;
-		double weightBlue = 2 + (255 - rmean) / 256;
-		return Math.sqrt(weightRed * red * red + weightGreen * green * green
-				+ weightBlue * blue * blue);
-	}
+	private static ColorComparator comparator = new EuclideanColorComparator();
 
 	static Color closestColor(Color color) {
 		if (colors.size() <= 0) {
@@ -402,7 +445,8 @@ public class Main {
 		Color best = colors.get(0);
 
 		for (Color candidate : colors) {
-			if (distance(color, candidate) < distance(color, best)) {
+			if (comparator.distance(color, candidate) < comparator.distance(
+					color, best)) {
 				best = candidate;
 			}
 		}
@@ -434,7 +478,7 @@ public class Main {
 				b.getWidth());
 
 		for (int i = 0; i < aPixels.length && i < bPixels.length; i++) {
-			result += distance(new Color(aPixels[i]), new Color(bPixels[i]));
+			result += comparator.distance(new Color(aPixels[i]), new Color(bPixels[i]));
 		}
 
 		return result;
