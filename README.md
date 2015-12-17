@@ -7,6 +7,6 @@ This work was supported by a grant of the Bulgarian National Scientific Fund und
 
 ![alt tag](http://s4.postimg.org/v4ylmm46l/output_hy_WXCL.gif)
 
-![alt tag](http://s7.postimg.org/42l6s52mz/output_s_PD9bt.gif)
-
 ![alt tag](http://s30.postimg.org/he6j2q9ox/output_5l1_Rf_U.gif)
+
+![alt tag](http://s7.postimg.org/42l6s52mz/output_s_PD9bt.gif)
