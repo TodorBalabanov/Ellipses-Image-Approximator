@@ -5,7 +5,10 @@ import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.geom.Line2D;
 import java.awt.image.BufferedImage;
+import java.io.BufferedOutputStream;
+import java.io.DataOutputStream;
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.Collections;
 import java.util.HashMap;
@@ -114,6 +117,11 @@ class Ellipse {
 		line = new Line2D.Double(x1, y1, x2, y2);
 	}
 
+	@Override
+	public String toString() {
+		return "Ellipse [x1=" + x1 + ", y1=" + y1 + ", x2=" + x2 + ", y2=" + y2
+				+ ", color=" + color + "]";
+	}
 }
 
 class Chromosome {
@@ -131,6 +139,12 @@ class Chromosome {
 		for (Ellipse e : chromosome.ellipses) {
 			ellipses.addElement(new Ellipse(e));
 		}
+	}
+
+	@Override
+	public String toString() {
+		return "Chromosome [ellipses=" + ellipses + ", fittnes=" + fittnes
+				+ "]";
 	}
 }
 
@@ -376,9 +390,8 @@ class Population {
 		double size = offspring.ellipses.size();
 		double distance = Main.distance(image, experimental);
 		double alpha = Main.alphaLevel(experimental);
-		offspring.fittnes = 0.1D * size + 0.6D
-				* distance * distance * distance + 0.3D
-				* alpha * alpha;
+		offspring.fittnes = 0.1D * size + 0.6D * distance * distance * distance
+				+ 0.3D * alpha * alpha;
 	}
 
 	void survive() {
@@ -398,6 +411,15 @@ class Population {
 						synchronized (experimental) {
 							ImageIO.write(experimental, "png", new File(""
 									+ System.currentTimeMillis() + ".png"));
+
+							DataOutputStream out = new DataOutputStream(
+									new BufferedOutputStream(
+											new FileOutputStream(
+													""
+															+ System.currentTimeMillis()
+															+ ".txt")));
+							out.writeUTF(best.toString());
+							out.close();
 						}
 					} catch (IOException e) {
 					}
@@ -481,7 +503,8 @@ public class Main {
 				b.getWidth());
 
 		for (int i = 0; i < aPixels.length && i < bPixels.length; i++) {
-			result += comparator.distance(new Color(aPixels[i]), new Color(bPixels[i]));
+			result += comparator.distance(new Color(aPixels[i]), new Color(
+					bPixels[i]));
 		}
 
 		return result;
@@ -562,6 +585,14 @@ public class Main {
 
 		executor.shutdown();
 		executor.awaitTermination(1000, TimeUnit.DAYS);
+
+		/*
+		 * Print plotting instructions.
+		 */
+		DataOutputStream out = new DataOutputStream(new BufferedOutputStream(
+				new FileOutputStream("" + System.currentTimeMillis() + ".txt")));
+		out.writeUTF(population.best.toString());
+		out.close();
 
 		/*
 		 * Report result.
