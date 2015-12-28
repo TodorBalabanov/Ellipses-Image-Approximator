@@ -412,13 +412,9 @@ class Population {
 							ImageIO.write(experimental, "png", new File(""
 									+ System.currentTimeMillis() + ".png"));
 
-							DataOutputStream out = new DataOutputStream(
-									new BufferedOutputStream(
-											new FileOutputStream(
-													""
-															+ System.currentTimeMillis()
-															+ ".txt")));
-							out.writeUTF(best.toString());
+							BufferedOutputStream out = new BufferedOutputStream(
+									new FileOutputStream("" + System.currentTimeMillis() + ".txt"));
+							out.write(best.toString().getBytes());
 							out.close();
 						}
 					} catch (IOException e) {
@@ -589,9 +585,9 @@ public class Main {
 		/*
 		 * Print plotting instructions.
 		 */
-		DataOutputStream out = new DataOutputStream(new BufferedOutputStream(
-				new FileOutputStream("" + System.currentTimeMillis() + ".txt")));
-		out.writeUTF(population.best.toString());
+		BufferedOutputStream out = new BufferedOutputStream(
+				new FileOutputStream("" + System.currentTimeMillis() + ".txt"));
+		out.write(population.best.toString().getBytes());
 		out.close();
 
 		/*
