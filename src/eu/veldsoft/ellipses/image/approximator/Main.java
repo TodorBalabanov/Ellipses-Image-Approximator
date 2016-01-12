@@ -25,6 +25,12 @@ interface ColorComparator {
 	public double distance(Color a, Color b);
 }
 
+class Constants {
+	public static boolean USE_PIXEL_INFOMATION = false;
+
+	public static boolean COLORS_EVOTUION = true;
+}
+
 class HSVColorComparator implements ColorComparator {
 	private double meanRed;
 	private int deltaRed;
@@ -125,12 +131,19 @@ class Ellipse {
 }
 
 class Chromosome {
+	Vector<Color> colors = new Vector<Color>();
 	Vector<Ellipse> ellipses = new Vector<Ellipse>();
 	double fittnes = Double.MAX_VALUE;
 
-	public Chromosome(Vector<Ellipse> ellipses, double fittnes) {
+	public Chromosome(Vector<Color> colors, Vector<Ellipse> ellipses,
+			double fittnes) {
 		super();
-		this.ellipses = ellipses;
+		for (Color c : colors) {
+			colors.addElement(new Color(c.getRGB()));
+		}
+		for (Ellipse e : ellipses) {
+			ellipses.addElement(new Ellipse(e));
+		}
 		this.fittnes = fittnes;
 	}
 
@@ -139,12 +152,15 @@ class Chromosome {
 		for (Ellipse e : chromosome.ellipses) {
 			ellipses.addElement(new Ellipse(e));
 		}
+		for (Color c : chromosome.colors) {
+			colors.addElement(new Color(c.getRGB()));
+		}
 	}
 
 	@Override
 	public String toString() {
-		return "Chromosome [ellipses=" + ellipses + ", fittnes=" + fittnes
-				+ "]";
+		return "Chromosome [colors=" + colors + ", ellipses=" + ellipses
+				+ ", fittnes=" + fittnes + "]";
 	}
 }
 
@@ -157,7 +173,6 @@ class Population {
 	private Vector<Chromosome> chromosomes = new Vector<Chromosome>();
 	private BufferedImage image = null;
 	private BufferedImage experimental = null;
-	private Map<Color, Integer> histogram = new HashMap<Color, Integer>();
 
 	public Population(Population population) {
 		super();
@@ -170,32 +185,16 @@ class Population {
 		this.experimental = null;
 		this.best = population.best;
 		this.chromosomes = new Vector<Chromosome>();
-		this.histogram = population.histogram;
 
 		for (Chromosome c : population.chromosomes) {
 			chromosomes.add(new Chromosome(c));
 		}
 	}
 
-	public Population(int size, BufferedImage image) {
+	public Population(int size, BufferedImage image, Vector<Color> colors) {
 		super();
 
 		this.image = image;
-
-		/*
-		 * Calculate the most used colors from the original picture.
-		 */
-		int pixels[] = image.getRGB(0, 0, image.getWidth(), image.getHeight(),
-				null, 0, image.getWidth());
-		for (int i = 0; i < pixels.length; i++) {
-			Color color = Main.closestColor(new Color(pixels[i]));
-
-			if (histogram.containsKey(color) == false) {
-				histogram.put(color, 1);
-			} else {
-				histogram.put(color, histogram.get(color) + 1);
-			}
-		}
 
 		/*
 		 * At least 4 chromosomes are needed in order the algorithm to work.
@@ -208,8 +207,8 @@ class Population {
 		 * Generate random population and evaluate chromosomes in it.
 		 */
 		for (int i = 0; i < size; i++) {
-			offspring = new Chromosome(Main.randomApproximatedEllipses(image),
-					Double.MAX_VALUE);
+			offspring = new Chromosome(colors, Main.randomApproximatedEllipses(
+					image, colors), Double.MAX_VALUE);
 			evaluate();
 			chromosomes.addElement(offspring);
 		}
@@ -291,7 +290,16 @@ class Population {
 			return;
 		}
 
-		offspring = new Chromosome(new Vector<Ellipse>(), Double.MAX_VALUE);
+		offspring = new Chromosome(new Vector<Color>(), new Vector<Ellipse>(),
+				Double.MAX_VALUE);
+
+		for (int i = 0; i < first.colors.size() && i < second.colors.size(); i++) {
+			if (Util.PRNG.nextBoolean()) {
+				offspring.colors.add(first.colors.elementAt(i));
+			} else {
+				offspring.colors.add(second.colors.elementAt(i));
+			}
+		}
 
 		for (Ellipse e : first.ellipses) {
 			if (Util.PRNG.nextBoolean() == true) {
@@ -312,6 +320,12 @@ class Population {
 		 */
 		if (Util.PRNG.nextDouble() > 0.01) {
 			return;
+		}
+
+		if (Constants.COLORS_EVOTUION == true) {
+			offspring.colors.setElementAt(
+					new Color(Util.PRNG.nextInt(0x1000000)),
+					Util.PRNG.nextInt(offspring.colors.size()));
 		}
 
 		double factor = Util.PRNG.nextDouble();
@@ -360,6 +374,22 @@ class Population {
 
 	void evaluate() {
 		/*
+		 * Calculate the most used colors from the original picture.
+		 */
+		Map<Color, Integer> histogram = new HashMap<Color, Integer>();
+		int pixels[] = image.getRGB(0, 0, image.getWidth(), image.getHeight(),
+				null, 0, image.getWidth());
+		for (int i = 0; i < pixels.length; i++) {
+			Color color = Main.closestColor(new Color(pixels[i]), offspring.colors);
+
+			if (histogram.containsKey(color) == false) {
+				histogram.put(color, 1);
+			} else {
+				histogram.put(color, histogram.get(color) + 1);
+			}
+		}
+	
+		/*
 		 * Sort according color usage and x-y coordinates. The most used colors
 		 * should be drawn first.
 		 */
@@ -389,7 +419,7 @@ class Population {
 		// coefficients.
 		double size = offspring.ellipses.size();
 		double distance = Main.distance(image, experimental);
-		double alpha = Main.alphaLevel(experimental);
+		double alpha = Main.alphaLevel(experimental, offspring.colors);
 		offspring.fittnes = 0.1D * size + 0.6D * distance * distance * distance
 				+ 0.3D * alpha * alpha;
 	}
@@ -413,7 +443,9 @@ class Population {
 									+ System.currentTimeMillis() + ".png"));
 
 							BufferedOutputStream out = new BufferedOutputStream(
-									new FileOutputStream("" + System.currentTimeMillis() + ".txt"));
+									new FileOutputStream(""
+											+ System.currentTimeMillis()
+											+ ".txt"));
 							out.write(best.toString().getBytes());
 							out.close();
 						}
@@ -455,10 +487,9 @@ public class Main {
 	private static int DEFAULT_THREAD_POOL_SIZE = 1;
 
 	private static BufferedImage original = null;
-	private static Vector<Color> colors = new Vector<Color>();
 	private static ColorComparator comparator = new EuclideanColorComparator();
 
-	static Color closestColor(Color color) {
+	static Color closestColor(Color color, Vector<Color> colors) {
 		if (colors.size() <= 0) {
 			return color;
 		}
@@ -475,7 +506,7 @@ public class Main {
 		return best;
 	}
 
-	static double alphaLevel(BufferedImage image) {
+	static double alphaLevel(BufferedImage image, Vector<Color> colors) {
 		double level = 0;
 
 		int pixels[] = image.getRGB(0, 0, image.getWidth(), image.getHeight(),
@@ -520,7 +551,8 @@ public class Main {
 		return image;
 	}
 
-	static Vector<Ellipse> randomApproximatedEllipses(BufferedImage image) {
+	static Vector<Ellipse> randomApproximatedEllipses(BufferedImage image,
+			Vector<Color> colors) {
 		Vector<Ellipse> ellipses = new Vector<Ellipse>();
 
 		int numberOfEllipses = (int) ((4 * image.getWidth() * image.getHeight()) / (Math.PI
@@ -532,9 +564,14 @@ public class Main {
 		numberOfEllipses *= 1.0D + 3.0D * Util.PRNG.nextDouble();
 
 		for (int i = 0, x, y; i < numberOfEllipses; i++) {
+			Color color = colors.elementAt(Util.PRNG.nextInt(colors.size()));
 			x = Util.PRNG.nextInt(image.getWidth());
 			y = Util.PRNG.nextInt(image.getHeight());
-			Color color = closestColor(new Color(image.getRGB(x, y)));
+
+			if (Constants.USE_PIXEL_INFOMATION == true) {
+				color = closestColor(new Color(image.getRGB(x, y)), colors);
+			}
+
 			double theta = 2.0D * Math.PI * Util.PRNG.nextDouble();
 
 			ellipses.add(new Ellipse(x, y, theta, color));
@@ -549,12 +586,13 @@ public class Main {
 		Ellipse.width = Integer.valueOf(args[3]);
 		Ellipse.height = Integer.valueOf(args[4]);
 
+		Vector<Color> colors = new Vector<Color>();
 		for (int i = 5; i < args.length; i++) {
 			colors.add(new Color(Integer.parseInt(args[i], 16)));
 		}
 
 		Population population = new Population(Integer.valueOf(args[1]),
-				original);
+				original, colors);
 
 		/*
 		 * Report initial best solution.
