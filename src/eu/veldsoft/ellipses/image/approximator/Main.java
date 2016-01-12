@@ -380,8 +380,7 @@ class Population {
 		int pixels[] = image.getRGB(0, 0, image.getWidth(), image.getHeight(),
 				null, 0, image.getWidth());
 		for (int i = 0; i < pixels.length; i++) {
-			Color color = Main.closestColor(new Color(pixels[i]),
-					offspring.colors);
+			Color color = new Color(pixels[i]);
 
 			if (histogram.containsKey(color) == false) {
 				histogram.put(color, 1);
