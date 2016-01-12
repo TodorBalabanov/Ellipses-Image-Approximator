@@ -108,7 +108,7 @@ class Ellipse {
 	public Ellipse(int x, int y, double theta, Color color) {
 		super();
 
-		this.color = color;
+		this.color = new Color(color.getRGB());
 		line = new Line2D.Double(0, 0, 0, 0);
 
 		setup(x, y, theta);
@@ -119,7 +119,7 @@ class Ellipse {
 		y1 = ellipse.y1;
 		x2 = ellipse.x2;
 		y2 = ellipse.y2;
-		color = ellipse.color;
+		color = new Color(ellipse.color.getRGB());
 		line = new Line2D.Double(x1, y1, x2, y2);
 	}
 
@@ -135,14 +135,14 @@ class Chromosome {
 	Vector<Ellipse> ellipses = new Vector<Ellipse>();
 	double fittnes = Double.MAX_VALUE;
 
-	public Chromosome(Vector<Color> colors, Vector<Ellipse> ellipses,
-			double fittnes) {
+	public Chromosome(final Vector<Color> colors,
+			final Vector<Ellipse> ellipses, double fittnes) {
 		super();
 		for (Color c : colors) {
-			colors.addElement(new Color(c.getRGB()));
+			this.colors.addElement(new Color(c.getRGB()));
 		}
 		for (Ellipse e : ellipses) {
-			ellipses.addElement(new Ellipse(e));
+			this.ellipses.addElement(new Ellipse(e));
 		}
 		this.fittnes = fittnes;
 	}
@@ -150,10 +150,10 @@ class Chromosome {
 	public Chromosome(Chromosome chromosome) {
 		this.fittnes = chromosome.fittnes;
 		for (Ellipse e : chromosome.ellipses) {
-			ellipses.addElement(new Ellipse(e));
+			this.ellipses.addElement(new Ellipse(e));
 		}
 		for (Color c : chromosome.colors) {
-			colors.addElement(new Color(c.getRGB()));
+			this.colors.addElement(new Color(c.getRGB()));
 		}
 	}
 
@@ -380,7 +380,8 @@ class Population {
 		int pixels[] = image.getRGB(0, 0, image.getWidth(), image.getHeight(),
 				null, 0, image.getWidth());
 		for (int i = 0; i < pixels.length; i++) {
-			Color color = Main.closestColor(new Color(pixels[i]), offspring.colors);
+			Color color = Main.closestColor(new Color(pixels[i]),
+					offspring.colors);
 
 			if (histogram.containsKey(color) == false) {
 				histogram.put(color, 1);
@@ -388,7 +389,7 @@ class Population {
 				histogram.put(color, histogram.get(color) + 1);
 			}
 		}
-	
+
 		/*
 		 * Sort according color usage and x-y coordinates. The most used colors
 		 * should be drawn first.
