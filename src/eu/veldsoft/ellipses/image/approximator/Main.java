@@ -398,6 +398,11 @@ class Population {
 				Ellipse a = offspring.ellipses.get(i);
 				Ellipse b = offspring.ellipses.get(j);
 
+				if (histogram.get(a.color) == null
+						|| histogram.get(b.color) == null) {
+					continue;
+				}
+
 				if (histogram.get(a.color) < histogram.get(b.color)) {
 					Collections.swap(offspring.ellipses, i, j);
 				} else if (histogram.get(a.color) == histogram.get(b.color)) {
