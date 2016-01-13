@@ -26,7 +26,7 @@ interface ColorComparator {
 }
 
 class Constants {
-	public static boolean USE_PIXEL_INFOMATION = false;
+	public static boolean USE_PIXEL_INFOMATION = true;
 
 	public static boolean COLORS_EVOTUION = true;
 }
@@ -566,7 +566,7 @@ public class Main {
 		/*
 		 * It is not clear why this multiplication is needed.
 		 */
-		numberOfEllipses *= 1.0D + 3.0D * Util.PRNG.nextDouble();
+		numberOfEllipses *= 1.0D + 9.0D * Util.PRNG.nextDouble();
 
 		for (int i = 0, x, y; i < numberOfEllipses; i++) {
 			Color color = colors.elementAt(Util.PRNG.nextInt(colors.size()));
