@@ -542,6 +542,7 @@ public class Main {
 		return result;
 	}
 
+	//TODO Implement colors merge in overlapping elipses.
 	static BufferedImage drawEllipses(BufferedImage image,
 			Vector<Ellipse> ellipses) {
 		Graphics2D graphics = (Graphics2D) image.getGraphics();
