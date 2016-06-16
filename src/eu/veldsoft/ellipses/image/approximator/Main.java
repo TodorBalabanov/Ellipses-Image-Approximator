@@ -5,7 +5,6 @@ import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
 import java.io.BufferedOutputStream;
-import java.io.DataOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.util.Vector;
@@ -16,8 +15,6 @@ import java.util.concurrent.TimeUnit;
 import javax.imageio.ImageIO;
 
 public class Main {
-	private static int DEFAULT_THREAD_POOL_SIZE = 1;
-
 	private static BufferedImage original = null;
 	private static ColorComparator comparator = new EuclideanColorComparator();
 
@@ -69,7 +66,7 @@ public class Main {
 		return result;
 	}
 
-	//TODO Implement colors merge in overlapping elipses.
+	// TODO Implement colors merge in overlapping ellipses.
 	static BufferedImage drawEllipses(BufferedImage image,
 			Vector<Ellipse> ellipses) {
 		Graphics2D graphics = (Graphics2D) image.getGraphics();
@@ -101,7 +98,7 @@ public class Main {
 			x = Util.PRNG.nextInt(image.getWidth());
 			y = Util.PRNG.nextInt(image.getHeight());
 
-			if (Constants.USE_PIXEL_INFOMATION == true) {
+			if (Util.USE_PIXEL_INFOMATION == true) {
 				color = closestColor(new Color(image.getRGB(x, y)), colors);
 			}
 
@@ -113,6 +110,13 @@ public class Main {
 		return ellipses;
 	}
 
+	/**
+	 * java Main <image file name> <population size> <number of evolutions>
+	 * <primitive width> <primitive height>
+	 * 
+	 * @param args
+	 * @throws Exception
+	 */
 	public static void main(String[] args) throws Exception {
 		original = ImageIO.read(new File(args[0]));
 
@@ -121,7 +125,8 @@ public class Main {
 
 		Vector<Color> colors = new Vector<Color>();
 		for (int i = 5; i < args.length; i++) {
-			colors.add(new Color(Integer.parseInt(args[i], 16)));
+			colors.add(new Color(Integer.parseInt(args[i], 16)
+					| Util.ELLIPSES_ALPHA << 24, true));
 		}
 
 		Population population = new Population(Integer.valueOf(args[1]),
@@ -141,14 +146,15 @@ public class Main {
 		int totalEvaluations = Integer.valueOf(args[2]);
 
 		ThreadPoolExecutor executor = (ThreadPoolExecutor) Executors
-				.newFixedThreadPool(DEFAULT_THREAD_POOL_SIZE);
+				.newFixedThreadPool(Util.DEFAULT_THREAD_POOL_SIZE);
 
-		for (int i = 1; i < DEFAULT_THREAD_POOL_SIZE; i++) {
+		for (int i = 1; i < Util.DEFAULT_THREAD_POOL_SIZE; i++) {
 			executor.execute(new Task(totalEvaluations
-					/ DEFAULT_THREAD_POOL_SIZE, new Population(population)));
+					/ Util.DEFAULT_THREAD_POOL_SIZE, new Population(population)));
 		}
-		executor.execute(new Task(totalEvaluations / DEFAULT_THREAD_POOL_SIZE
-				+ totalEvaluations % DEFAULT_THREAD_POOL_SIZE, population));
+		executor.execute(new Task(totalEvaluations
+				/ Util.DEFAULT_THREAD_POOL_SIZE + totalEvaluations
+				% Util.DEFAULT_THREAD_POOL_SIZE, population));
 
 		executor.shutdown();
 		executor.awaitTermination(1000, TimeUnit.DAYS);

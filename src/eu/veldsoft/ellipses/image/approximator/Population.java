@@ -171,7 +171,7 @@ class Population {
 			return;
 		}
 
-		if (Constants.COLORS_EVOTUION == true) {
+		if (Util.COLORS_EVOTUION == true) {
 			offspring.colors.setElementAt(
 					new Color(Util.PRNG.nextInt(0x1000000)),
 					Util.PRNG.nextInt(offspring.colors.size()));
