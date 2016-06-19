@@ -24,7 +24,6 @@ public class Main {
 		}
 
 		Color best = colors.get(0);
-
 		for (Color candidate : colors) {
 			if (comparator.distance(color, candidate) < comparator.distance(
 					color, best)) {
