@@ -3,7 +3,7 @@ package eu.veldsoft.ellipses.image.approximator;
 import java.awt.Color;
 import java.awt.geom.Line2D;
 
-class Ellipse {
+class Ellipse implements Cloneable {
 	static int width;
 	static int height;
 
@@ -39,6 +39,11 @@ class Ellipse {
 		y2 = ellipse.y2;
 		color = new Color(ellipse.color.getRGB());
 		line = new Line2D.Double(x1, y1, x2, y2);
+	}
+
+	@Override
+	protected Object clone() throws CloneNotSupportedException {
+		return new Ellipse(this);
 	}
 
 	@Override

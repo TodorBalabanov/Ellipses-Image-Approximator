@@ -2,9 +2,9 @@ package eu.veldsoft.ellipses.image.approximator;
 
 class Task implements Runnable {
 	private long evaluations;
-	private Population population;
+	private Population1 population;
 
-	public Task(long evaluations, Population population) {
+	public Task(long evaluations, Population1 population) {
 		super();
 		this.evaluations = evaluations;
 		this.population = population;

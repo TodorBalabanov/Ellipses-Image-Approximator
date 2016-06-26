@@ -13,17 +13,17 @@ import java.util.Vector;
 
 import javax.imageio.ImageIO;
 
-class Population {
-	Chromosome best = null;
-	private Chromosome first = null;
-	private Chromosome second = null;
-	private Chromosome offspring = null;
-	private Chromosome result = null;
-	private Vector<Chromosome> chromosomes = new Vector<Chromosome>();
+class Population1 {
+	Chromosome1 best = null;
+	private Chromosome1 first = null;
+	private Chromosome1 second = null;
+	private Chromosome1 offspring = null;
+	private Chromosome1 result = null;
+	private Vector<Chromosome1> chromosomes = new Vector<Chromosome1>();
 	private BufferedImage image = null;
 	private BufferedImage experimental = null;
 
-	public Population(Population population) {
+	public Population1(Population1 population) {
 		super();
 
 		this.first = null;
@@ -33,14 +33,14 @@ class Population {
 		this.image = population.image;
 		this.experimental = null;
 		this.best = population.best;
-		this.chromosomes = new Vector<Chromosome>();
+		this.chromosomes = new Vector<Chromosome1>();
 
-		for (Chromosome c : population.chromosomes) {
-			chromosomes.add(new Chromosome(c));
+		for (Chromosome1 c : population.chromosomes) {
+			chromosomes.add(new Chromosome1(c));
 		}
 	}
 
-	public Population(int size, BufferedImage image, Vector<Color> colors) {
+	public Population1(int size, BufferedImage image, Vector<Color> colors) {
 		super();
 
 		this.image = image;
@@ -56,7 +56,7 @@ class Population {
 		 * Generate random population and evaluate chromosomes in it.
 		 */
 		for (int i = 0; i < size; i++) {
-			offspring = new Chromosome(colors, Main.randomApproximatedEllipses(
+			offspring = new Chromosome1(colors, Main.randomApproximatedEllipses(
 					image, colors), Double.MAX_VALUE);
 			evaluate();
 			chromosomes.addElement(offspring);
@@ -67,7 +67,7 @@ class Population {
 		 * Find the best initial chromosome.
 		 */
 		best = chromosomes.firstElement();
-		for (Chromosome c : chromosomes) {
+		for (Chromosome1 c : chromosomes) {
 			if (best.fittnes > c.fittnes) {
 				best = c;
 			}
@@ -86,39 +86,39 @@ class Population {
 			double level = Util.PRNG.nextDouble();
 			if (level > 0.95) {
 				if (result.fittnes > first.fittnes) {
-					Chromosome buffer = result;
+					Chromosome1 buffer = result;
 					result = first;
 					first = buffer;
 				}
 				if (result.fittnes > second.fittnes) {
-					Chromosome buffer = result;
+					Chromosome1 buffer = result;
 					result = second;
 					second = buffer;
 				}
 			} else if (level > 0.65) {
 				if (first.fittnes > second.fittnes) {
-					Chromosome buffer = first;
+					Chromosome1 buffer = first;
 					first = second;
 					second = buffer;
 				}
 				if (result.fittnes < first.fittnes) {
-					Chromosome buffer = result;
+					Chromosome1 buffer = result;
 					result = first;
 					first = buffer;
 				}
 				if (result.fittnes > second.fittnes) {
-					Chromosome buffer = result;
+					Chromosome1 buffer = result;
 					result = second;
 					second = buffer;
 				}
 			} else if (level > 0.00) {
 				if (result.fittnes < first.fittnes) {
-					Chromosome buffer = result;
+					Chromosome1 buffer = result;
 					result = first;
 					first = buffer;
 				}
 				if (result.fittnes < second.fittnes) {
-					Chromosome buffer = result;
+					Chromosome1 buffer = result;
 					result = second;
 					second = buffer;
 				}
@@ -139,7 +139,7 @@ class Population {
 			return;
 		}
 
-		offspring = new Chromosome(new Vector<Color>(), new Vector<Ellipse>(),
+		offspring = new Chromosome1(new Vector<Color>(), new Vector<Ellipse>(),
 				Double.MAX_VALUE);
 
 		for (int i = 0; i < first.colors.size() && i < second.colors.size(); i++) {

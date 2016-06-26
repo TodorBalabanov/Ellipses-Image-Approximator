@@ -3,12 +3,12 @@ package eu.veldsoft.ellipses.image.approximator;
 import java.awt.Color;
 import java.util.Vector;
 
-class Chromosome {
+class Chromosome1 {
 	Vector<Color> colors = new Vector<Color>();
 	Vector<Ellipse> ellipses = new Vector<Ellipse>();
 	double fittnes = Double.MAX_VALUE;
 
-	public Chromosome(final Vector<Color> colors,
+	public Chromosome1(final Vector<Color> colors,
 			final Vector<Ellipse> ellipses, double fittnes) {
 		super();
 		for (Color c : colors) {
@@ -20,7 +20,7 @@ class Chromosome {
 		this.fittnes = fittnes;
 	}
 
-	public Chromosome(Chromosome chromosome) {
+	public Chromosome1(Chromosome1 chromosome) {
 		this.fittnes = chromosome.fittnes;
 		for (Ellipse e : chromosome.ellipses) {
 			this.ellipses.addElement(new Ellipse(e));
