@@ -111,7 +111,11 @@ public class Main {
 
 	/**
 	 * java Main <image file name> <population size> <number of evolutions>
-	 * <primitive width> <primitive height>
+	 * <primitive width> <primitive height> <list of colors>
+	 * 
+	 * Example: java Main ./dat/0001.jpg 11 10 6 9 000000 808080 C0C0C0 FFFFFF
+	 * 800000 FF0000 808000 FFFF00 008000 00FF00 008080 00FFFF 000080 0000FF
+	 * 800080 FF00FF
 	 * 
 	 * @param args
 	 * @throws Exception
