@@ -56,8 +56,7 @@ class Population1 {
 		 * Generate random population and evaluate chromosomes in it.
 		 */
 		for (int i = 0; i < size; i++) {
-			offspring = new Chromosome1(colors, Main.randomApproximatedEllipses(
-					image, colors), Double.MAX_VALUE);
+			offspring = new Chromosome1(colors, Util.randomApproximatedEllipses(image, colors), Double.MAX_VALUE);
 			evaluate();
 			chromosomes.addElement(offspring);
 		}
@@ -123,8 +122,7 @@ class Population1 {
 					second = buffer;
 				}
 			}
-		} while (result == best || first == second || first == result
-				|| second == result);
+		} while (result == best || first == second || first == result || second == result);
 	}
 
 	void crossover() {
@@ -133,14 +131,12 @@ class Population1 {
 		 */
 		if (Util.PRNG.nextDouble() > 0.96) {
 			do {
-				offspring = chromosomes.get(Util.PRNG.nextInt(chromosomes
-						.size()));
+				offspring = chromosomes.get(Util.PRNG.nextInt(chromosomes.size()));
 			} while (offspring == best);
 			return;
 		}
 
-		offspring = new Chromosome1(new Vector<Color>(), new Vector<Ellipse>(),
-				Double.MAX_VALUE);
+		offspring = new Chromosome1(new Vector<Color>(), new Vector<Ellipse>(), Double.MAX_VALUE);
 
 		for (int i = 0; i < first.colors.size() && i < second.colors.size(); i++) {
 			if (Util.PRNG.nextBoolean()) {
@@ -172,14 +168,12 @@ class Population1 {
 		}
 
 		if (Util.COLORS_EVOTUION == true) {
-			offspring.colors.setElementAt(
-					new Color(Util.PRNG.nextInt(0x1000000)),
+			offspring.colors.setElementAt(new Color(Util.PRNG.nextInt(0x1000000)),
 					Util.PRNG.nextInt(offspring.colors.size()));
 		}
 
 		double factor = Util.PRNG.nextDouble();
-		Ellipse e = offspring.ellipses.get(Util.PRNG.nextInt(offspring.ellipses
-				.size()));
+		Ellipse e = offspring.ellipses.get(Util.PRNG.nextInt(offspring.ellipses.size()));
 
 		int dx = (int) (e.width * factor);
 		int dy = (int) (e.height * factor);
@@ -189,8 +183,7 @@ class Population1 {
 		 * Mutate color in some cases by taking color of other ellipse.
 		 */
 		if (Util.PRNG.nextDouble() < factor) {
-			e.color = offspring.ellipses.get(Util.PRNG
-					.nextInt(offspring.ellipses.size())).color;
+			e.color = offspring.ellipses.get(Util.PRNG.nextInt(offspring.ellipses.size())).color;
 		}
 
 		/*
@@ -213,11 +206,9 @@ class Population1 {
 		e.setup((int) ((e.x1 + e.x2) / 2.0), (int) ((e.y1 + e.y2) / 2.0), theta);
 
 		// TODO Ellipse should not be outside of the image.
-		if (e.x1 < 0 || e.y1 < 0 || e.x2 < 0 || e.y2 < 0
-				|| e.x1 >= image.getWidth() || e.y1 >= image.getHeight()
+		if (e.x1 < 0 || e.y1 < 0 || e.x2 < 0 || e.y2 < 0 || e.x1 >= image.getWidth() || e.y1 >= image.getHeight()
 				|| e.x2 >= image.getWidth() || e.y2 >= image.getHeight()) {
-			e.setup((int) (image.getWidth() / 2.0),
-					(int) (image.getHeight() / 2.0), theta);
+			e.setup((int) (image.getWidth() / 2.0), (int) (image.getHeight() / 2.0), theta);
 		}
 	}
 
@@ -226,8 +217,7 @@ class Population1 {
 		 * Calculate the most used colors from the original picture.
 		 */
 		Map<Color, Integer> histogram = new HashMap<Color, Integer>();
-		int pixels[] = image.getRGB(0, 0, image.getWidth(), image.getHeight(),
-				null, 0, image.getWidth());
+		int pixels[] = image.getRGB(0, 0, image.getWidth(), image.getHeight(), null, 0, image.getWidth());
 		for (int i = 0; i < pixels.length; i++) {
 			Color color = new Color(pixels[i]);
 
@@ -247,8 +237,7 @@ class Population1 {
 				Ellipse a = offspring.ellipses.get(i);
 				Ellipse b = offspring.ellipses.get(j);
 
-				if (histogram.get(a.color) == null
-						|| histogram.get(b.color) == null) {
+				if (histogram.get(a.color) == null || histogram.get(b.color) == null) {
 					continue;
 				}
 
@@ -265,17 +254,15 @@ class Population1 {
 		/*
 		 * Draw ellipses.
 		 */
-		experimental = new BufferedImage(image.getWidth(), image.getHeight(),
-				BufferedImage.TYPE_INT_ARGB);
-		Main.drawEllipses(experimental, offspring.ellipses);
+		experimental = new BufferedImage(image.getWidth(), image.getHeight(), BufferedImage.TYPE_INT_ARGB);
+		Util.drawEllipses(experimental, offspring.ellipses);
 
 		// TODO Number of ellipses and images distance can be used with some
 		// coefficients.
 		double size = offspring.ellipses.size();
-		double distance = Main.distance(image, experimental);
-		double alpha = Main.alphaLevel(experimental, offspring.colors);
-		offspring.fittnes = 0.1D * size + 0.6D * distance * distance * distance
-				+ 0.3D * alpha * alpha;
+		double distance = Util.distance(image, experimental);
+		double alpha = Util.alphaLevel(experimental, offspring.colors);
+		offspring.fittnes = 0.1D * size + 0.6D * distance * distance * distance + 0.3D * alpha * alpha;
 	}
 
 	void survive() {
@@ -293,13 +280,10 @@ class Population1 {
 				public void run() {
 					try {
 						synchronized (experimental) {
-							ImageIO.write(experimental, "png", new File(""
-									+ System.currentTimeMillis() + ".png"));
+							ImageIO.write(experimental, "png", new File("" + System.currentTimeMillis() + ".png"));
 
 							BufferedOutputStream out = new BufferedOutputStream(
-									new FileOutputStream(""
-											+ System.currentTimeMillis()
-											+ ".txt"));
+									new FileOutputStream("" + System.currentTimeMillis() + ".txt"));
 							out.write(best.toString().getBytes());
 							out.close();
 						}
