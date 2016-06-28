@@ -255,7 +255,7 @@ class Population1 {
 		 * Draw ellipses.
 		 */
 		experimental = new BufferedImage(image.getWidth(), image.getHeight(), BufferedImage.TYPE_INT_ARGB);
-		Util.drawEllipses(experimental, offspring.ellipses);
+		Util.drawEllipses(experimental, (Ellipse[]) offspring.ellipses.toArray());
 
 		// TODO Number of ellipses and images distance can be used with some
 		// coefficients.

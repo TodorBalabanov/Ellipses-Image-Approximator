@@ -2,7 +2,7 @@ package eu.veldsoft.ellipses.image.approximator;
 
 import java.awt.Color;
 import java.awt.image.BufferedImage;
-import java.util.Collections;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -58,8 +58,8 @@ class EllipseListChromosome extends AbstractListChromosome<Ellipse> {
 		 * should be drawn first.
 		 */
 		Util.usage.setHistogram(histogram);
-		List<Ellipse> list = getRepresentation();
-		Collections.sort(list, Util.usage);
+		Ellipse list[] = getRepresentation().toArray(new Ellipse[getRepresentation().size()]);
+		Arrays.sort(list, Util.usage);
 
 		/*
 		 * Draw ellipses.
@@ -70,7 +70,7 @@ class EllipseListChromosome extends AbstractListChromosome<Ellipse> {
 
 		// TODO Number of ellipses and images distance can be used with some
 		// coefficients.
-		double size = list.size();
+		double size = list.length;
 		double distance = Util.distance(imate, experimental);
 		double alpha = Util.alphaLevel(experimental, colors);
 

@@ -4,12 +4,15 @@ import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Random;
 import java.util.Vector;
+
+import javax.imageio.ImageIO;
 
 import org.apache.commons.math3.genetics.Chromosome;
 import org.apache.commons.math3.genetics.ElitisticListPopulation;
@@ -85,7 +88,7 @@ class Util {
 		return level / pixels.length;
 	}
 
-	static BufferedImage drawEllipses(BufferedImage image, List<Ellipse> ellipses) {
+	static BufferedImage drawEllipses(BufferedImage image, Ellipse ellipses[]) {
 		// TODO Implement colors merge in overlapping ellipses.
 		Graphics2D graphics = (Graphics2D) image.getGraphics();
 		graphics.setStroke(new BasicStroke(Ellipse.height, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND));
@@ -154,5 +157,15 @@ class Util {
 					image, colors));
 		}
 		return new ElitisticListPopulation(list, 2 * list.size(), ELITISM_RATE);
+	}
+
+	static void writeSolution(BufferedImage image, List<Ellipse> list, String file) {
+		try {
+			ImageIO.write(Util.drawEllipses(
+					new BufferedImage(image.getWidth(), image.getHeight(), BufferedImage.TYPE_INT_ARGB),
+					list.toArray(new Ellipse[list.size()])), "png", new File(file));
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 	}
 }

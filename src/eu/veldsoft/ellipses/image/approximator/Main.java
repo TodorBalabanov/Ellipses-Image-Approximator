@@ -49,11 +49,8 @@ public class Main {
 		/*
 		 * Report initial best solution.
 		 */
-		ImageIO.write(
-				Util.drawEllipses(
-						new BufferedImage(original.getWidth(), original.getHeight(), BufferedImage.TYPE_INT_ARGB),
-						((EllipseListChromosome) initial.getFittestChromosome()).getEllipses()),
-				"png", new File(path + System.currentTimeMillis() + ".png"));
+		Util.writeSolution(original, ((EllipseListChromosome) initial.getFittestChromosome()).getEllipses(),
+				path + System.currentTimeMillis() + ".png");
 		System.out.println("Optimization start ...");
 
 		// TODO Crossover is for chromosomes with different length.
@@ -73,11 +70,8 @@ public class Main {
 		/*
 		 * Report result.
 		 */
-		ImageIO.write(
-				Util.drawEllipses(
-						new BufferedImage(original.getWidth(), original.getHeight(), BufferedImage.TYPE_INT_ARGB),
-						((EllipseListChromosome) optimized.getFittestChromosome()).getEllipses()),
-				"png", new File(path + System.currentTimeMillis() + ".png"));
+		Util.writeSolution(original, ((EllipseListChromosome) optimized.getFittestChromosome()).getEllipses(),
+				path + System.currentTimeMillis() + ".png");
 		System.out.println("Optimization end ...");
 	}
 }
