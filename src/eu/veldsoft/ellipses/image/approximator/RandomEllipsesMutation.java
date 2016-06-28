@@ -20,7 +20,7 @@ class RandomEllipsesMutation implements MutationPolicy {
 
 	@Override
 	public Chromosome mutate(Chromosome original) {
-		if (!(original instanceof EllipseListChromosome)) {
+		if (original instanceof EllipseListChromosome == false) {
 			throw new IllegalArgumentException();
 		}
 

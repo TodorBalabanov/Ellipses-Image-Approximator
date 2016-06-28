@@ -74,7 +74,7 @@ class EllipseListChromosome extends AbstractListChromosome<Ellipse> {
 		double distance = Util.distance(imate, experimental);
 		double alpha = Util.alphaLevel(experimental, colors);
 
-		return 0.1D * size + 0.6D * distance * distance * distance + 0.3D * alpha * alpha;
+		return 0.001D / (1D + size) + 0.1D / (1D + distance) + 0.01D / (1D + alpha);
 	}
 
 	@Override

@@ -5,6 +5,7 @@ import java.awt.image.BufferedImage;
 import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
+import java.util.Iterator;
 import java.util.Vector;
 
 import javax.imageio.ImageIO;
@@ -13,7 +14,6 @@ import org.apache.commons.math3.genetics.FixedElapsedTime;
 import org.apache.commons.math3.genetics.GeneticAlgorithm;
 import org.apache.commons.math3.genetics.Population;
 import org.apache.commons.math3.genetics.TournamentSelection;
-import org.apache.commons.math3.genetics.UniformCrossover;
 
 public class Main {
 	private static BufferedImage original = null;
@@ -22,7 +22,7 @@ public class Main {
 	 * java Main <image file name> <population size> <number of evolutions>
 	 * <primitive width> <primitive height> <list of colors>
 	 * 
-	 * Example: java Main ./dat/0001.jpg 11 10 6 9 000000 808080 C0C0C0 FFFFFF
+	 * Example: java Main ./dat/0001.jpg 31 100 3 9 000000 808080 C0C0C0 FFFFFF
 	 * 800000 FF0000 808000 FFFF00 008000 00FF00 008080 00FFFF 000080 0000FF
 	 * 800080 FF00FF
 	 * 
@@ -52,9 +52,10 @@ public class Main {
 		Util.writeSolution(original, ((EllipseListChromosome) initial.getFittestChromosome()).getEllipses(),
 				path + System.currentTimeMillis() + ".png");
 		System.out.println("Optimization start ...");
+		System.out.write(("Fitness: " + initial.getFittestChromosome().getFitness() + "\n").getBytes());
 
 		// TODO Crossover is for chromosomes with different length.
-		GeneticAlgorithm algorithm = new GeneticAlgorithm(new UniformCrossover<Ellipse>(0.5), Util.CROSSOVER_RATE,
+		GeneticAlgorithm algorithm = new GeneticAlgorithm(new InstructionsCrossover(), Util.CROSSOVER_RATE,
 				new RandomEllipsesMutation(original, colors), Util.MUTATION_RATE,
 				new TournamentSelection(Util.TOURNAMENT_ARITY));
 		Population optimized = algorithm.evolve(initial, new FixedElapsedTime(Util.OPTIMIZATION_TIMEOUT_SECONDS));
@@ -64,6 +65,7 @@ public class Main {
 		 */
 		BufferedOutputStream out = new BufferedOutputStream(
 				new FileOutputStream(path + System.currentTimeMillis() + ".txt"));
+		out.write(("Fitness: " + optimized.getFittestChromosome().getFitness() + "\n").getBytes());
 		out.write(((EllipseListChromosome) optimized.getFittestChromosome()).getEllipses().toString().getBytes());
 		out.close();
 
@@ -73,5 +75,6 @@ public class Main {
 		Util.writeSolution(original, ((EllipseListChromosome) optimized.getFittestChromosome()).getEllipses(),
 				path + System.currentTimeMillis() + ".png");
 		System.out.println("Optimization end ...");
+		System.out.write(("Fitness: " + optimized.getFittestChromosome().getFitness() + "\n").getBytes());
 	}
 }

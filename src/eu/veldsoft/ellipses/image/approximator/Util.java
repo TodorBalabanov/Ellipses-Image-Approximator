@@ -42,22 +42,21 @@ class Util {
 
 	static final int TOURNAMENT_ARITY = 2;
 
-	static final long OPTIMIZATION_TIMEOUT_SECONDS = 5 * 60 * 1;
+	static final long OPTIMIZATION_TIMEOUT_SECONDS = 1 * 60 * 1;
 
 	static ColorCoordinatesComparator usage = new ColorCoordinatesComparator();
 
 	static double distance(BufferedImage a, BufferedImage b) {
-		double result = 0;
-
 		int aPixels[] = a.getRGB(0, 0, a.getWidth(), a.getHeight(), null, 0, a.getWidth());
-
 		int bPixels[] = b.getRGB(0, 0, b.getWidth(), b.getHeight(), null, 0, b.getWidth());
 
-		for (int i = 0; i < aPixels.length && i < bPixels.length; i++) {
-			result += euclidean.distance(new Color(aPixels[i]), new Color(bPixels[i]));
+		int size = 0;
+		double sum = 0;
+		for (size = 0; size < aPixels.length && size < bPixels.length; size++) {
+			sum += euclidean.distance(new Color(aPixels[size]), new Color(bPixels[size]));
 		}
 
-		return result;
+		return sum / size;
 	}
 
 	static Color closestColor(Color color, Vector<Color> colors) {
@@ -104,7 +103,7 @@ class Util {
 	static Vector<Ellipse> randomApproximatedEllipses(BufferedImage image, Vector<Color> colors) {
 		Vector<Ellipse> ellipses = new Vector<Ellipse>();
 
-		int numberOfEllipses = (int) ((4 * image.getWidth() * image.getHeight())
+		int numberOfEllipses = (int) ((16 * image.getWidth() * image.getHeight())
 				/ (Math.PI * Ellipse.width * Ellipse.height));
 
 		/*
