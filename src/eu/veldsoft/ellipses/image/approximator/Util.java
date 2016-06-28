@@ -5,6 +5,7 @@ import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Random;
@@ -16,7 +17,7 @@ import org.apache.commons.math3.genetics.Population;
 
 class Util {
 
-	private static ColorComparator comparator = new EuclideanColorComparator();
+	private static ColorComparator euclidean = new EuclideanColorComparator();
 
 	static final Random PRNG = new Random();
 
@@ -40,6 +41,8 @@ class Util {
 
 	static final long OPTIMIZATION_TIMEOUT_SECONDS = 60 * 60 * 1;
 
+	static ColorCoordinatesComparator usage = new ColorCoordinatesComparator();
+
 	static double distance(BufferedImage a, BufferedImage b) {
 		double result = 0;
 
@@ -48,7 +51,7 @@ class Util {
 		int bPixels[] = b.getRGB(0, 0, b.getWidth(), b.getHeight(), null, 0, b.getWidth());
 
 		for (int i = 0; i < aPixels.length && i < bPixels.length; i++) {
-			result += comparator.distance(new Color(aPixels[i]), new Color(bPixels[i]));
+			result += euclidean.distance(new Color(aPixels[i]), new Color(bPixels[i]));
 		}
 
 		return result;
@@ -61,7 +64,7 @@ class Util {
 
 		Color best = colors.get(0);
 		for (Color candidate : colors) {
-			if (comparator.distance(color, candidate) < comparator.distance(color, best)) {
+			if (euclidean.distance(color, candidate) < euclidean.distance(color, best)) {
 				best = candidate;
 			}
 		}

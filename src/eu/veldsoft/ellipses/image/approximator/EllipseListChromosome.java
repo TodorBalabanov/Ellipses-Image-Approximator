@@ -57,25 +57,9 @@ class EllipseListChromosome extends AbstractListChromosome<Ellipse> {
 		 * Sort according color usage and x-y coordinates. The most used colors
 		 * should be drawn first.
 		 */
+		Util.usage.setHistogram(histogram);
 		List<Ellipse> list = getRepresentation();
-		for (int i = 0; i < list.size(); i++) {
-			for (int j = i + 1; j < list.size(); j++) {
-				Ellipse a = list.get(i);
-				Ellipse b = list.get(j);
-
-				if (histogram.get(a.color) == null || histogram.get(b.color) == null) {
-					continue;
-				}
-
-				if (histogram.get(a.color) < histogram.get(b.color)) {
-					Collections.swap(list, i, j);
-				} else if (histogram.get(a.color) == histogram.get(b.color)) {
-					if (a.x1 * a.x1 + a.y1 * a.y1 > b.x1 * b.x1 + b.y1 * b.y1) {
-						Collections.swap(list, i, j);
-					}
-				}
-			}
-		}
+		Collections.sort(list, Util.usage);
 
 		/*
 		 * Draw ellipses.
