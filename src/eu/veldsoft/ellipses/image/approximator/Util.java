@@ -39,7 +39,7 @@ class Util {
 
 	static final int TOURNAMENT_ARITY = 2;
 
-	static final long OPTIMIZATION_TIMEOUT_SECONDS = 60 * 60 * 1;
+	static final long OPTIMIZATION_TIMEOUT_SECONDS = 60 * 1;
 
 	static ColorCoordinatesComparator usage = new ColorCoordinatesComparator();
 
