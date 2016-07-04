@@ -5,6 +5,7 @@ import java.awt.image.BufferedImage;
 import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
+import java.util.List;
 import java.util.Vector;
 
 import javax.imageio.ImageIO;
@@ -13,6 +14,8 @@ import org.apache.commons.math3.genetics.FixedElapsedTime;
 import org.apache.commons.math3.genetics.GeneticAlgorithm;
 import org.apache.commons.math3.genetics.Population;
 import org.apache.commons.math3.genetics.TournamentSelection;
+
+import com.ugos.acs.AntGraph;
 
 public class Main {
 	private static BufferedImage original = null;
@@ -65,6 +68,40 @@ public class Main {
 						Util.TOURNAMENT_ARITY));
 		Population optimized = algorithm.evolve(initial, new FixedElapsedTime(
 				Util.OPTIMIZATION_TIMEOUT_SECONDS));
+
+		/*
+		 * For ant colony graph.
+		 */
+		List<Ellipse> ellipses = ((EllipseListChromosome) optimized
+				.getFittestChromosome()).getEllipses();
+		double neighbours[][] = new double[ellipses.size()][ellipses.size()];
+		for (int i = 0; i < ellipses.size(); i++) {
+			for (int j = 0; j < ellipses.size(); j++) {
+				/*
+				 * Node will not be connected to itself.
+				 */
+				if (i == j) {
+					neighbours[i][j] = 0;
+					continue;
+				}
+
+				// TODO Maybe other distance formula should be used.
+				neighbours[i][j] = Math.abs(ellipses.get(i).color.getRGB()
+						- ellipses.get(j).color.getRGB());
+				neighbours[j][i] = neighbours[i][j];
+			}
+		}
+		AntGraph graph = new AntGraph(ellipses.size(), neighbours);
+
+		/*
+		 * Run ant colony optimization.
+		 */
+		for (int i = 0; i < Util.NUMBER_OF_REPETITIONS; i++) {
+			graph.resetTau();
+			AntColony4EIA colony = new AntColony4EIA(graph,
+					Util.NUMBER_OF_ANTS, Util.NUMBER_OF_ITERATIONS);
+			colony.start();
+		}
 
 		/*
 		 * Print plotting instructions.
