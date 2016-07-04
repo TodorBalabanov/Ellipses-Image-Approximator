@@ -12,6 +12,7 @@ class EuclideanColorComparator implements ColorComparator {
 		deltaGreen = a.getGreen() - b.getGreen();
 		deltaBlue = a.getBlue() - b.getBlue();
 
-		return Math.sqrt(deltaRed * deltaRed + deltaGreen * deltaGreen + deltaBlue * deltaBlue);
+		return Math.sqrt(deltaRed * deltaRed + deltaGreen * deltaGreen
+				+ deltaBlue * deltaBlue);
 	}
 }

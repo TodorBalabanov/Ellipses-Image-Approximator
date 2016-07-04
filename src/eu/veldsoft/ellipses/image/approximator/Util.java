@@ -19,7 +19,6 @@ import org.apache.commons.math3.genetics.ElitisticListPopulation;
 import org.apache.commons.math3.genetics.Population;
 
 class Util {
-
 	private static ColorComparator euclidean = new EuclideanColorComparator();
 
 	static final Random PRNG = new Random();
@@ -45,15 +44,20 @@ class Util {
 	static final long OPTIMIZATION_TIMEOUT_SECONDS = 1 * 60 * 1;
 
 	static ColorCoordinatesComparator usage = new ColorCoordinatesComparator();
+	
+	static String log = "";
 
 	static double distance(BufferedImage a, BufferedImage b) {
-		int aPixels[] = a.getRGB(0, 0, a.getWidth(), a.getHeight(), null, 0, a.getWidth());
-		int bPixels[] = b.getRGB(0, 0, b.getWidth(), b.getHeight(), null, 0, b.getWidth());
+		int aPixels[] = a.getRGB(0, 0, a.getWidth(), a.getHeight(), null, 0,
+				a.getWidth());
+		int bPixels[] = b.getRGB(0, 0, b.getWidth(), b.getHeight(), null, 0,
+				b.getWidth());
 
 		int size = 0;
 		double sum = 0;
 		for (size = 0; size < aPixels.length && size < bPixels.length; size++) {
-			sum += euclidean.distance(new Color(aPixels[size]), new Color(bPixels[size]));
+			sum += euclidean.distance(new Color(aPixels[size]), new Color(
+					bPixels[size]));
 		}
 
 		return sum / size;
@@ -66,7 +70,8 @@ class Util {
 
 		Color best = colors.get(0);
 		for (Color candidate : colors) {
-			if (euclidean.distance(color, candidate) < euclidean.distance(color, best)) {
+			if (euclidean.distance(color, candidate) < euclidean.distance(
+					color, best)) {
 				best = candidate;
 			}
 		}
@@ -77,7 +82,8 @@ class Util {
 	static double alphaLevel(BufferedImage image, Vector<Color> colors) {
 		double level = 0;
 
-		int pixels[] = image.getRGB(0, 0, image.getWidth(), image.getHeight(), null, 0, image.getWidth());
+		int pixels[] = image.getRGB(0, 0, image.getWidth(), image.getHeight(),
+				null, 0, image.getWidth());
 		for (int i = 0; i < pixels.length; i++) {
 			if (colors.contains(new Color(pixels[i])) == false) {
 				level++;
@@ -90,7 +96,8 @@ class Util {
 	static BufferedImage drawEllipses(BufferedImage image, Ellipse ellipses[]) {
 		// TODO Implement colors merge in overlapping ellipses.
 		Graphics2D graphics = (Graphics2D) image.getGraphics();
-		graphics.setStroke(new BasicStroke(Ellipse.height, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND));
+		graphics.setStroke(new BasicStroke(Ellipse.height,
+				BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND));
 
 		for (Ellipse e : ellipses) {
 			graphics.setColor(e.color);
@@ -100,11 +107,12 @@ class Util {
 		return image;
 	}
 
-	static Vector<Ellipse> randomApproximatedEllipses(BufferedImage image, Vector<Color> colors) {
+	static Vector<Ellipse> randomApproximatedEllipses(BufferedImage image,
+			Vector<Color> colors) {
 		Vector<Ellipse> ellipses = new Vector<Ellipse>();
 
-		int numberOfEllipses = (int) ((16 * image.getWidth() * image.getHeight())
-				/ (Math.PI * Ellipse.width * Ellipse.height));
+		int numberOfEllipses = (int) ((16 * image.getWidth() * image
+				.getHeight()) / (Math.PI * Ellipse.width * Ellipse.height));
 
 		/*
 		 * It is not clear why this multiplication is needed.
@@ -128,7 +136,8 @@ class Util {
 		return ellipses;
 	}
 
-	static List<Ellipse> randomRepresentation(BufferedImage image, Vector<Color> colors, int length) {
+	static List<Ellipse> randomRepresentation(BufferedImage image,
+			Vector<Color> colors, int length) {
 		List<Ellipse> random = new ArrayList<Ellipse>();
 
 		for (int i = 0, x, y; i < length; i++) {
@@ -148,21 +157,27 @@ class Util {
 		return random;
 	}
 
-	static Population randomInitialPopulation(BufferedImage image, Vector<Color> colors) {
+	static Population randomInitialPopulation(BufferedImage image,
+			Vector<Color> colors) {
 		List<Chromosome> list = new LinkedList<Chromosome>();
 		for (int i = 0; i < POPULATION_SIZE; i++) {
-			list.add(new EllipseListChromosome(randomRepresentation(image, colors,
-					(int) ((4 * image.getWidth() * image.getHeight()) / (Math.PI * Ellipse.width * Ellipse.height))),
-					image, colors));
+			list.add(new EllipseListChromosome(
+					randomRepresentation(
+							image,
+							colors,
+							(int) ((4 * image.getWidth() * image.getHeight()) / (Math.PI
+									* Ellipse.width * Ellipse.height))), image,
+					colors));
 		}
 		return new ElitisticListPopulation(list, 2 * list.size(), ELITISM_RATE);
 	}
 
-	static void writeSolution(BufferedImage image, List<Ellipse> list, String file) {
+	static void writeSolution(BufferedImage image, List<Ellipse> list,
+			String file) {
 		try {
-			ImageIO.write(Util.drawEllipses(
-					new BufferedImage(image.getWidth(), image.getHeight(), BufferedImage.TYPE_INT_ARGB),
-					list.toArray(new Ellipse[list.size()])), "png", new File(file));
+			ImageIO.write(Util.drawEllipses(new BufferedImage(image.getWidth(),
+					image.getHeight(), BufferedImage.TYPE_INT_ARGB), list
+					.toArray(new Ellipse[list.size()])), "png", new File(file));
 		} catch (IOException e) {
 			e.printStackTrace();
 		}

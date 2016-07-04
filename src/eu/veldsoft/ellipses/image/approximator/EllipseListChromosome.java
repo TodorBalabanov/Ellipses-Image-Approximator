@@ -15,21 +15,23 @@ class EllipseListChromosome extends AbstractListChromosome<Ellipse> {
 	private BufferedImage imate = null;
 	private Vector<Color> colors = null;
 
-	public EllipseListChromosome(Ellipse[] representation, BufferedImage image, Vector<Color> colors)
+	public EllipseListChromosome(Ellipse[] representation, BufferedImage image,
+			Vector<Color> colors) throws InvalidRepresentationException {
+		super(representation);
+		this.imate = image;
+		this.colors = colors;
+	}
+
+	public EllipseListChromosome(List<Ellipse> representation,
+			BufferedImage image, Vector<Color> colors)
 			throws InvalidRepresentationException {
 		super(representation);
 		this.imate = image;
 		this.colors = colors;
 	}
 
-	public EllipseListChromosome(List<Ellipse> representation, BufferedImage image, Vector<Color> colors)
-			throws InvalidRepresentationException {
-		super(representation);
-		this.imate = image;
-		this.colors = colors;
-	}
-
-	public EllipseListChromosome(List<Ellipse> representation, boolean copy, BufferedImage image, Vector<Color> colors)
+	public EllipseListChromosome(List<Ellipse> representation, boolean copy,
+			BufferedImage image, Vector<Color> colors)
 			throws InvalidRepresentationException {
 		super(representation, copy);
 		this.imate = image;
@@ -42,7 +44,8 @@ class EllipseListChromosome extends AbstractListChromosome<Ellipse> {
 		 * Calculate the most used colors from the original picture.
 		 */
 		Map<Color, Integer> histogram = new HashMap<Color, Integer>();
-		int pixels[] = imate.getRGB(0, 0, imate.getWidth(), imate.getHeight(), null, 0, imate.getWidth());
+		int pixels[] = imate.getRGB(0, 0, imate.getWidth(), imate.getHeight(),
+				null, 0, imate.getWidth());
 		for (int i = 0; i < pixels.length; i++) {
 			Color color = new Color(pixels[i]);
 
@@ -58,14 +61,21 @@ class EllipseListChromosome extends AbstractListChromosome<Ellipse> {
 		 * should be drawn first.
 		 */
 		Util.usage.setHistogram(histogram);
-		Ellipse list[] = getRepresentation().toArray(new Ellipse[getRepresentation().size()]);
-		Arrays.sort(list, Util.usage);
+		Ellipse list[] = getRepresentation().toArray(
+				new Ellipse[getRepresentation().size()]);
+
+		/*
+		 * Sorting have sense if only there is a histogram calculated.
+		 */
+		if (histogram != null) {
+			Arrays.sort(list, Util.usage);
+		}
 
 		/*
 		 * Draw ellipses.
 		 */
-		BufferedImage experimental = new BufferedImage(imate.getWidth(), imate.getHeight(),
-				BufferedImage.TYPE_INT_ARGB);
+		BufferedImage experimental = new BufferedImage(imate.getWidth(),
+				imate.getHeight(), BufferedImage.TYPE_INT_ARGB);
 		Util.drawEllipses(experimental, list);
 
 		// TODO Number of ellipses and images distance can be used with some
@@ -74,11 +84,13 @@ class EllipseListChromosome extends AbstractListChromosome<Ellipse> {
 		double distance = Util.distance(imate, experimental);
 		double alpha = Util.alphaLevel(experimental, colors);
 
-		return 0.001D / (1D + size) + 0.1D / (1D + distance) + 0.01D / (1D + alpha);
+		return 0.001D / (1D + size) + 0.1D / (1D + distance) + 0.01D
+				/ (1D + alpha);
 	}
 
 	@Override
-	protected void checkValidity(List<Ellipse> list) throws InvalidRepresentationException {
+	protected void checkValidity(List<Ellipse> list)
+			throws InvalidRepresentationException {
 	}
 
 	@Override
@@ -92,7 +104,8 @@ class EllipseListChromosome extends AbstractListChromosome<Ellipse> {
 	}
 
 	public Ellipse getRandomElement() {
-		return getRepresentation().get(Util.PRNG.nextInt(getRepresentation().size()));
+		return getRepresentation().get(
+				Util.PRNG.nextInt(getRepresentation().size()));
 	}
 
 }

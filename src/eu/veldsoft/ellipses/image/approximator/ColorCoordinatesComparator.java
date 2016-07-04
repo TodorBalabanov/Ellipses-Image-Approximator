@@ -13,9 +13,24 @@ public class ColorCoordinatesComparator implements Comparator<Ellipse> {
 
 	@Override
 	public int compare(Ellipse a, Ellipse b) {
-		if (histogram == null || histogram.get(a.color) == null
-				|| histogram.get(b.color) == null) {
+		if (histogram == null) {
 			return 0;
+		}
+
+		/*
+		 * If the color is not in the histogram, just add one.
+		 */
+		if (histogram.containsKey(a.color) == false) {
+			//TODO Maybe it should be implemented by some other way.
+			histogram.put(a.color, 1);
+		}
+
+		/*
+		 * If the color is not in the histogram, just add one.
+		 */
+		if (histogram.containsKey(b.color) == false) {
+			//TODO Maybe it should be implemented by some other way.
+			histogram.put(b.color, 1);
 		}
 
 		// TODO It is not tested and maybe is not correct.

@@ -8,7 +8,8 @@ class Chromosome1 {
 	Vector<Ellipse> ellipses = new Vector<Ellipse>();
 	double fittnes = Double.MAX_VALUE;
 
-	public Chromosome1(final Vector<Color> colors, final Vector<Ellipse> ellipses, double fittnes) {
+	public Chromosome1(final Vector<Color> colors,
+			final Vector<Ellipse> ellipses, double fittnes) {
 		super();
 		for (Color c : colors) {
 			this.colors.addElement(new Color(c.getRGB()));
@@ -31,6 +32,7 @@ class Chromosome1 {
 
 	@Override
 	public String toString() {
-		return "Chromosome [colors=" + colors + ", ellipses=" + ellipses + ", fittnes=" + fittnes + "]";
+		return "Chromosome [colors=" + colors + ", ellipses=" + ellipses
+				+ ", fittnes=" + fittnes + "]";
 	}
 }
