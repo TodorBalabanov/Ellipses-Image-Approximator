@@ -40,14 +40,14 @@ class Util {
 	static final double ELITISM_RATE = 0.1;
 
 	static final int TOURNAMENT_ARITY = 2;
-
-	static final long OPTIMIZATION_TIMEOUT_SECONDS = 1 * 60 * 1;
 	
 	static final int NUMBER_OF_ANTS = 17;
 	
 	static final int NUMBER_OF_ITERATIONS = 10;
 	
 	static final int NUMBER_OF_REPETITIONS = 10;
+
+	static final long OPTIMIZATION_TIMEOUT_SECONDS = 15 * 60 * 1;
 
 	static ColorCoordinatesComparator usage = new ColorCoordinatesComparator();
 	
