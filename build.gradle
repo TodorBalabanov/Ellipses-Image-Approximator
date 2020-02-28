@@ -14,7 +14,7 @@ dependencies {
 
 task jarAll(type: Jar) {
     manifest {
-        attributes 'Main-Class': 'Main'
+        attributes 'Main-Class': 'eu.veldsoft.ellipses.image.approximator.Main'
     }
     baseName = project.name + '-all'
     from { configurations.compile.collect { it.isDirectory() ? it : zipTree(it) } }
