@@ -3,7 +3,7 @@ package eu.veldsoft.ellipses.image.approximator;
 import java.awt.Color;
 import java.awt.geom.Line2D;
 
-class Ellipse implements Cloneable {
+class Ellipse implements Cloneable, GCode {
 	static int width;
 	static int height;
 
@@ -39,6 +39,21 @@ class Ellipse implements Cloneable {
 		y2 = ellipse.y2;
 		color = new Color(ellipse.color.getRGB());
 		line = new Line2D.Double(x1, y1, x2, y2);
+	}
+
+	@Override
+	public String toGCode(double xOffset, double yOffset, double zDown, double zUp, double scale) {
+		String gCode = "G00 Z"+zUp+" (Fast pen move up.)" + "\n"
+				+ "G00 X0.00 Y0.00 (Fast move to home position.)" + "\n"
+				+ "G00 Z"+zDown+" (Fast pen move down.)" + "\n"
+				+ "G04 P0.1 (Wait for one tenth of a second before proceeding.)"
+				+ "\n" + "G00 Z"+zUp+" (Fast pen move up.)" + "\n" + "G00 X" + (xOffset+x1*scale)
+				+ " Y" + (yOffset+y1*scale) + " (Fast move to first point position.)" + "\n"
+				+ "G01 Z"+zDown+" (Slow pen move down.)" + "\n" + "G01 X" + (xOffset+x2*scale)
+				+ " Y" + (yOffset+y1*scale) + " (Slow move to second point position.)" + "\n"
+				+ "G01 Z"+zUp+" (Slow pen move up.)";
+
+		return gCode;
 	}
 
 	@Override
