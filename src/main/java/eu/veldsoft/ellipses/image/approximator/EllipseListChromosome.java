@@ -11,7 +11,9 @@ import java.util.Vector;
 import org.apache.commons.math3.genetics.AbstractListChromosome;
 import org.apache.commons.math3.genetics.InvalidRepresentationException;
 
-class EllipseListChromosome extends AbstractListChromosome<Ellipse> {
+import eu.veldsoft.ellipses.image.approximator.GCode.Settings;
+
+class EllipseListChromosome extends AbstractListChromosome<Ellipse> implements GCode {
 	private BufferedImage imate = null;
 	private Vector<Color> colors = null;
 
@@ -106,6 +108,36 @@ class EllipseListChromosome extends AbstractListChromosome<Ellipse> {
 	public Ellipse getRandomElement() {
 		return getRepresentation().get(
 				Util.PRNG.nextInt(getRepresentation().size()));
+	}
+
+	@Override
+	public String toGCode(Settings configuration) {
+		String gCode = "";
+		
+		List<Ellipse> list = getRepresentation();
+		//TODO Sort by colors and create separate instructions.
+
+		/* Initialization of G Code script. */
+		gCode += "G21 (All units are in millimeters.)";
+		gCode += "\n";
+		gCode += "\n";
+		gCode += "G90 (Switch to absolute coordinates.)";
+		gCode += "\n";
+		gCode += "\n";
+		gCode += "G00 Z15.00 (Fast pen move up for initialization.)";
+		gCode += "\n";
+		gCode += "G00 X0.00 Y0.00 (Fast move to home position for initialization.)";
+		gCode += "\n";
+		gCode += "\n";
+		
+		/* Drawing instructions. */
+		for(Ellipse elipse : list) {
+			gCode += elipse.toGCode(configuration);
+			gCode += "\n";
+		}
+		gCode = gCode.trim();
+
+		return gCode;
 	}
 
 }

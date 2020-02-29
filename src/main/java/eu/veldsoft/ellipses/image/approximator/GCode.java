@@ -6,18 +6,41 @@ package eu.veldsoft.ellipses.image.approximator;
  * @author Todor Balabanov
  */
 interface GCode {
-	class Settings {}
-	
+	/**
+	 * Transformation parameters.
+	 */
+	class Settings {
+		double xOffset;
+		double yOffset;
+		double zDown;
+		double zUp;
+		double scale;
+		
+		/**
+		 * @param xOffset
+		 * @param yOffset
+		 * @param zDown
+		 * @param zUp
+		 * @param scale
+		 */
+		public Settings(double xOffset, double yOffset, double zDown,
+				double zUp, double scale) {
+			super();
+			this.xOffset = xOffset;
+			this.yOffset = yOffset;
+			this.zDown = zDown;
+			this.zUp = zUp;
+			this.scale = scale;
+		}
+	}
+
 	/**
 	 * Transform the object to G Code.
 	 * 
-	 * @param xOffset
-	 * @param yOffset
-	 * @param zDown
-	 * @param zUp
-	 * @param scale
+	 * @param configuration
+	 *            List of parameters for transformation adjustments.
 	 * 
 	 * @return G Code sequence.
 	 */
-	public String toGCode(double xOffset, double yOffset, double zDown, double zUp, double scale);
+	public String toGCode(Settings configuration);
 }
