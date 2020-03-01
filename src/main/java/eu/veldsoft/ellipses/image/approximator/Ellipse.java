@@ -49,7 +49,7 @@ class Ellipse implements Cloneable, GCode {
 				+ "\n" + "G00 X0.00 Y0.00 (Fast move to home position.)" + "\n"
 				+ "G00 Z" + configuration.zDown + " (Fast pen move down.)"
 				+ "\n"
-				+ "G04 P0.1 (Wait for one tenth of a second before proceeding.)"
+				+ "G04 P" + configuration.penRefillTime + " (Wait for pain refill before proceeding.)"
 				+ "\n" + "G00 Z" + configuration.zUp + " (Fast pen move up.)"
 				+ "\n" + "G00 X"
 				+ (configuration.xOffset + x1 * configuration.scale) + " Y"

@@ -55,7 +55,7 @@ public class Main {
 		// TODO Test G Code generation.
 		System.err.println(
 				((EllipseListChromosome) initial.getFittestChromosome())
-						.toGCode(new GCode.Settings(10, 10, 35, 15, 0.3)));
+						.toGCode(new GCode.Settings(10, 10, 35, 15, 0.3, 0.5, 600)));
 
 		/*
 		 * Report initial best solution.
