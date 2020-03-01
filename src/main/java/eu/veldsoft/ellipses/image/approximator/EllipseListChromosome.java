@@ -86,6 +86,7 @@ class EllipseListChromosome extends AbstractListChromosome<Ellipse> implements G
 		double distance = Util.distance(imate, experimental);
 		double alpha = Util.alphaLevel(experimental, colors);
 
+		//TODO Better handling of multiple criteria should be implemented. At least coefficients should be parameterized from outside.
 		return 0.001D / (1D + size) + 0.1D / (1D + distance) + 0.01D
 				/ (1D + alpha);
 	}
