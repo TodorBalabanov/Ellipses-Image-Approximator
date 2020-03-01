@@ -1,5 +1,6 @@
 # Ellipses Image Approximator
-It is an attempt to approximate full color image with limited color ellipses.
+
+It is an attempt to approximate full colors image with limited set of colors for simple ellipses.
 
 Acknowledgements
 
