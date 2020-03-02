@@ -24,9 +24,15 @@ public class Main {
 	 * java Main <image file name> <population size> <number of evolutions>
 	 * <primitive width> <primitive height> <list of colors>
 	 * 
-	 * Example: java -jar Ellipses-Image-Approximator-all.jar ../../dat/0001.jpg
-	 * 31 100 3 9 000000 808080 C0C0C0 FFFFFF 800000 FF0000 808000 FFFF00 008000
-	 * 00FF00 008080 00FFFF 000080 0000FF 800080 FF00FF
+	 * Example:
+	 * 
+	 * java -jar Ellipses-Image-Approximator-all.jar ../../dat/0001.jpg 31 100 3
+	 * 9 000000 808080 C0C0C0 FFFFFF 800000 FF0000 808000 FFFF00 008000 00FF00
+	 * 008080 00FFFF 000080 0000FF 800080 FF00FF
+	 * 
+	 * java -jar Ellipses-Image-Approximator-all.jar ../../dat/0005.jpg 11 7 5
+	 * 13 000000 808080 C0C0C0 FFFFFF 800000 FF0000 808000 FFFF00 008000 00FF00
+	 * 008080 00FFFF 000080 0000FF 800080 FF00FF
 	 * 
 	 * @param args
 	 *            Command line parameters.
@@ -55,7 +61,8 @@ public class Main {
 		// TODO Test G Code generation.
 		System.err.println(
 				((EllipseListChromosome) initial.getFittestChromosome())
-						.toGCode(new GCode.Settings(10, 10, 35, 15, 0.3, 0.5, 600)));
+						.toGCode(new GCode.Settings(10, 10, 35, 15, 0.3, 0.5,
+								600)));
 
 		/*
 		 * Report initial best solution.

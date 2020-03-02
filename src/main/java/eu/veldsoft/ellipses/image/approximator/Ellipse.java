@@ -3,6 +3,8 @@ package eu.veldsoft.ellipses.image.approximator;
 import java.awt.Color;
 import java.awt.geom.Line2D;
 
+import org.apache.commons.math3.util.Precision;
+
 import eu.veldsoft.ellipses.image.approximator.GCode.Settings;
 
 class Ellipse implements Cloneable, GCode {
@@ -48,16 +50,22 @@ class Ellipse implements Cloneable, GCode {
 		String gCode = "G00 Z" + configuration.zUp + " (Fast pen move up.)"
 				+ "\n" + "G00 X0.00 Y0.00 (Fast move to home position.)" + "\n"
 				+ "G00 Z" + configuration.zDown + " (Fast pen move down.)"
-				+ "\n"
-				+ "G04 P" + configuration.penRefillTime + " (Wait for pain refill before proceeding.)"
-				+ "\n" + "G00 Z" + configuration.zUp + " (Fast pen move up.)"
-				+ "\n" + "G00 X"
-				+ (configuration.xOffset + x1 * configuration.scale) + " Y"
-				+ (configuration.yOffset + y1 * configuration.scale)
+				+ "\n" + "G04 P" + configuration.penRefillTime
+				+ " (Wait for paint refill before proceeding.)" + "\n" + "G00 Z"
+				+ configuration.zUp + " (Fast pen move up.)" + "\n" + "G00 X"
+				+ Precision.round(
+						configuration.xOffset + x1 * configuration.scale, 2)
+				+ " Y"
+				+ Precision.round(
+						configuration.yOffset + y1 * configuration.scale, 2)
 				+ " (Fast move to first point position.)" + "\n" + "G01 Z"
 				+ configuration.zDown + " (Slow pen move down.)" + "\n"
-				+ "G01 X" + (configuration.xOffset + x2 * configuration.scale)
-				+ " Y" + (configuration.yOffset + y1 * configuration.scale)
+				+ "G01 X"
+				+ Precision.round(
+						configuration.xOffset + x2 * configuration.scale, 2)
+				+ " Y"
+				+ Precision.round(
+						configuration.yOffset + y1 * configuration.scale, 2)
 				+ " (Slow move to second point position.)" + "\n" + "G01 Z"
 				+ configuration.zUp + " (Slow pen move up.)";
 
@@ -72,6 +80,7 @@ class Ellipse implements Cloneable, GCode {
 	@Override
 	public String toString() {
 		return "Ellipse [x1=" + x1 + ", y1=" + y1 + ", x2=" + x2 + ", y2=" + y2
-				+ ", color=" + color + "]";
+				+ ", red=" + color.getRed() + ", green=" + color.getGreen()
+				+ ", blue=" + color.getBlue() + "]";
 	}
 }
