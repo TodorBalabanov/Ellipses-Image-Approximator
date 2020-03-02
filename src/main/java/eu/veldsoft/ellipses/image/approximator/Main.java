@@ -27,11 +27,11 @@ public class Main {
 	 * Example:
 	 * 
 	 * java -jar Ellipses-Image-Approximator-all.jar ../../dat/0001.jpg 31 100 3
-	 * 9 000000 808080 C0C0C0 FFFFFF 800000 FF0000 808000 FFFF00 008000 00FF00
+	 * 19 000000 808080 C0C0C0 FFFFFF 800000 FF0000 808000 FFFF00 008000 00FF00
 	 * 008080 00FFFF 000080 0000FF 800080 FF00FF
 	 * 
-	 * java -jar Ellipses-Image-Approximator-all.jar ../../dat/0005.jpg 11 7 5
-	 * 13 000000 808080 C0C0C0 FFFFFF 800000 FF0000 808000 FFFF00 008000 00FF00
+	 * java -jar Ellipses-Image-Approximator-all.jar ../../dat/0005.jpg 11 7 3
+	 * 19 000000 808080 C0C0C0 FFFFFF 800000 FF0000 808000 FFFF00 008000 00FF00
 	 * 008080 00FFFF 000080 0000FF 800080 FF00FF
 	 * 
 	 * @param args
@@ -58,10 +58,10 @@ public class Main {
 
 		Population initial = Util.randomInitialPopulation(original, colors);
 
-		// TODO Test G Code generation.
+		// TODO Test G Code generation with working area 200x200 millimeters.
 		System.err.println(
 				((EllipseListChromosome) initial.getFittestChromosome())
-						.toGCode(new GCode.Settings(10, 10, 35, 15, 0.3, 0.5,
+						.toGCode(new GCode.Settings(30, 30, 35, 15, 200.0/Math.max(original.getWidth(),original.getHeight()), 0.5,
 								600)));
 
 		/*
