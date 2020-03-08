@@ -114,14 +114,8 @@ class Util {
 			Vector<Color> colors) {
 		Vector<Ellipse> ellipses = new Vector<Ellipse>();
 
-		int numberOfEllipses = (int) ((16 * image.getWidth()
-				* image.getHeight())
-				/ (Math.PI * Ellipse.width * Ellipse.height));
-
-		/*
-		 * It is not clear why this multiplication is needed.
-		 */
-		numberOfEllipses *= 1.0D + 9.0D * PRNG.nextDouble();
+		/* Start with ellipse for each pixel. */
+		int numberOfEllipses = image.getWidth() * image.getHeight();
 
 		for (int i = 0, x, y; i < numberOfEllipses; i++) {
 			Color color = colors.elementAt(PRNG.nextInt(colors.size()));
@@ -167,8 +161,7 @@ class Util {
 		for (int i = 0; i < populationSize; i++) {
 			list.add(new EllipseListChromosome(randomRepresentation(image,
 					colors,
-					(int) ((4 * image.getWidth() * image.getHeight())
-							/ (Math.PI * Ellipse.width * Ellipse.height))),
+					image.getWidth() * image.getHeight()),
 					image, colors));
 		}
 		return new ElitisticListPopulation(list, 2 * list.size(), ELITISM_RATE);
