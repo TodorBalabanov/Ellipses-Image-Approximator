@@ -104,6 +104,7 @@ class EllipseListChromosome extends AbstractListChromosome<Ellipse>
 	@Override
 	protected void checkValidity(List<Ellipse> list)
 			throws InvalidRepresentationException {
+		// TODO Put all coordinates inside image dimentions. 
 	}
 
 	@Override
