@@ -5,8 +5,6 @@ import java.awt.geom.Line2D;
 
 import org.apache.commons.math3.util.Precision;
 
-import eu.veldsoft.ellipses.image.approximator.GCode.Settings;
-
 class Ellipse implements Cloneable, GCode {
 	static int width;
 	static int height;

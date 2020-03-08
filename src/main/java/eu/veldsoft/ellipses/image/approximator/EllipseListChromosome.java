@@ -2,7 +2,8 @@ package eu.veldsoft.ellipses.image.approximator;
 
 import java.awt.Color;
 import java.awt.image.BufferedImage;
-import java.util.Arrays;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -11,28 +12,30 @@ import java.util.Vector;
 import org.apache.commons.math3.genetics.AbstractListChromosome;
 import org.apache.commons.math3.genetics.InvalidRepresentationException;
 
-import eu.veldsoft.ellipses.image.approximator.GCode.Settings;
-
 class EllipseListChromosome extends AbstractListChromosome<Ellipse>
 		implements
 			GCode {
 	private BufferedImage image = null;
 	private Vector<Color> colors = null;
 
-	private Ellipse[] sort() {
+	private List<Ellipse> sort() {
 		/*
 		 * Calculate the most used colors from the original picture.
 		 */
-		Map<Color, Integer> histogram = new HashMap<Color, Integer>();
+		Map<String, Integer> histogram = new HashMap<String, Integer>();
 		int pixels[] = image.getRGB(0, 0, image.getWidth(), image.getHeight(),
 				null, 0, image.getWidth());
 		for (int i = 0; i < pixels.length; i++) {
 			Color color = new Color(pixels[i]);
+			color = Util.closestColor(color, colors);
+			// TODO It is not clear that mapping to the closest color is the
+			// correct way of histogram calculation.
 
-			if (histogram.containsKey(color) == false) {
-				histogram.put(color, 1);
+			if (histogram.containsKey(color.toString()) == false) {
+				histogram.put(color.toString(), 1);
 			} else {
-				histogram.put(color, histogram.get(color) + 1);
+				histogram.put(color.toString(),
+						histogram.get(color.toString()) + 1);
 			}
 		}
 
@@ -41,15 +44,12 @@ class EllipseListChromosome extends AbstractListChromosome<Ellipse>
 		 * should be drawn first.
 		 */
 		Util.usage.setHistogram(histogram);
-		Ellipse list[] = getRepresentation()
-				.toArray(new Ellipse[getRepresentation().size()]);
+		List<Ellipse> list = new ArrayList<Ellipse>(getRepresentation());
 
 		/*
 		 * Sorting have sense if only there is a histogram calculated.
 		 */
-		if (histogram != null) {
-			Arrays.sort(list, Util.usage);
-		}
+		Collections.sort(list, Util.usage);
 
 		return list;
 	}
@@ -80,7 +80,7 @@ class EllipseListChromosome extends AbstractListChromosome<Ellipse>
 	@Override
 	public double fitness() {
 		/* Sort ellipses by color with the most used color first. */
-		Ellipse list[] = sort();
+		List<Ellipse> list = sort();
 
 		/*
 		 * Draw ellipses.
@@ -91,7 +91,7 @@ class EllipseListChromosome extends AbstractListChromosome<Ellipse>
 
 		// TODO Number of ellipses and images distance can be used with some
 		// coefficients.
-		double size = list.length;
+		double size = list.size();
 		double distance = Util.distance(image, experimental);
 		double alpha = Util.alphaLevel(experimental, colors);
 
@@ -113,7 +113,7 @@ class EllipseListChromosome extends AbstractListChromosome<Ellipse>
 	}
 
 	public List<Ellipse> getEllipses() {
-		return getRepresentation();
+		return sort();
 	}
 
 	public Ellipse getRandomElement() {
@@ -125,11 +125,15 @@ class EllipseListChromosome extends AbstractListChromosome<Ellipse>
 	public String toGCode(Settings configuration) {
 		String gCode = "";
 
+		gCode += "(Solution with " + getFitness() + " as fitness value.)";
+		gCode += "\n";
+		gCode += "\n";
+
 		/* Sorting by colors is important for the plotting order. */
-		Ellipse list[] = sort();
+		List<Ellipse> list = sort();
 
 		/* Initialization of G Code script. */
-		Color color = list[0].color;
+		Color color = list.get(0).color;
 		gCode += "(G Code instructions for "
 				+ color.toString().replace("java.awt.Color", "") + " color.)";
 		gCode += "\n";

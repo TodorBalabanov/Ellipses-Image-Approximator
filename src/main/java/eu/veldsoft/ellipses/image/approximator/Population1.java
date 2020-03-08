@@ -6,6 +6,7 @@ import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
@@ -134,8 +135,8 @@ class Population1 {
 		 */
 		if (Util.PRNG.nextDouble() > 0.96) {
 			do {
-				offspring = chromosomes.get(Util.PRNG.nextInt(chromosomes
-						.size()));
+				offspring = chromosomes
+						.get(Util.PRNG.nextInt(chromosomes.size()));
 			} while (offspring == best);
 			return;
 		}
@@ -143,7 +144,8 @@ class Population1 {
 		offspring = new Chromosome1(new Vector<Color>(), new Vector<Ellipse>(),
 				Double.MAX_VALUE);
 
-		for (int i = 0; i < first.colors.size() && i < second.colors.size(); i++) {
+		for (int i = 0; i < first.colors.size()
+				&& i < second.colors.size(); i++) {
 			if (Util.PRNG.nextBoolean()) {
 				offspring.colors.add(first.colors.elementAt(i));
 			} else {
@@ -179,8 +181,8 @@ class Population1 {
 		}
 
 		double factor = Util.PRNG.nextDouble();
-		Ellipse e = offspring.ellipses.get(Util.PRNG.nextInt(offspring.ellipses
-				.size()));
+		Ellipse e = offspring.ellipses
+				.get(Util.PRNG.nextInt(offspring.ellipses.size()));
 
 		int dx = (int) (e.width * factor);
 		int dy = (int) (e.height * factor);
@@ -190,8 +192,8 @@ class Population1 {
 		 * Mutate color in some cases by taking color of other ellipse.
 		 */
 		if (Util.PRNG.nextDouble() < factor) {
-			e.color = offspring.ellipses.get(Util.PRNG
-					.nextInt(offspring.ellipses.size())).color;
+			e.color = offspring.ellipses
+					.get(Util.PRNG.nextInt(offspring.ellipses.size())).color;
 		}
 
 		/*
@@ -211,7 +213,8 @@ class Population1 {
 		/*
 		 * Mutate rotation.
 		 */
-		e.setup((int) ((e.x1 + e.x2) / 2.0), (int) ((e.y1 + e.y2) / 2.0), theta);
+		e.setup((int) ((e.x1 + e.x2) / 2.0), (int) ((e.y1 + e.y2) / 2.0),
+				theta);
 
 		// TODO Ellipse should not be outside of the image.
 		if (e.x1 < 0 || e.y1 < 0 || e.x2 < 0 || e.y2 < 0
@@ -269,7 +272,7 @@ class Population1 {
 		experimental = new BufferedImage(image.getWidth(), image.getHeight(),
 				BufferedImage.TYPE_INT_ARGB);
 		Util.drawEllipses(experimental,
-				(Ellipse[]) offspring.ellipses.toArray());
+				new ArrayList<Ellipse>(offspring.ellipses));
 
 		// TODO Number of ellipses and images distance can be used with some
 		// coefficients.
@@ -295,13 +298,13 @@ class Population1 {
 				public void run() {
 					try {
 						synchronized (experimental) {
-							ImageIO.write(experimental, "png", new File(""
-									+ System.currentTimeMillis() + ".png"));
+							ImageIO.write(experimental, "png", new File(
+									"" + System.currentTimeMillis() + ".png"));
 
 							BufferedOutputStream out = new BufferedOutputStream(
-									new FileOutputStream(""
-											+ System.currentTimeMillis()
-											+ ".txt"));
+									new FileOutputStream(
+											"" + System.currentTimeMillis()
+													+ ".txt"));
 							out.write(best.toString().getBytes());
 							out.close();
 						}
