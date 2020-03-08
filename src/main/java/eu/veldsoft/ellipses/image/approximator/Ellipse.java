@@ -28,7 +28,7 @@ class Ellipse implements Cloneable, GCode {
 	public Ellipse(int x, int y, double theta, Color color) {
 		super();
 
-		this.color = new Color(color.getRGB());
+		this.color = color;
 		line = new Line2D.Double(0, 0, 0, 0);
 
 		setup(x, y, theta);
