@@ -104,7 +104,19 @@ class EllipseListChromosome extends AbstractListChromosome<Ellipse>
 	@Override
 	protected void checkValidity(List<Ellipse> list)
 			throws InvalidRepresentationException {
-		// TODO Put all coordinates inside image dimentions. 
+		/* Put all coordinates inside image dimentions. */ 
+		for(ellipse : list) {
+			while (ellipse.x1 < 0 || ellipse.y1 < 0 || ellipse.x2 < 0 || ellipse.y2 < 0 
+					|| ellipse.x1 >= image.getWidth()
+					|| ellipse.y1 >= image.getHeight()
+					|| ellipse.x2 >= image.getWidth()
+					|| ellipse.y2 >= image.getHeight()) {
+				ellipse.x1 += Util.PRNG.nextInt(3) - 1;
+				ellipse.y1 += Util.PRNG.nextInt(3) - 1;
+				ellipse.x2 += Util.PRNG.nextInt(3) - 1;
+				ellipse.y2 += Util.PRNG.nextInt(3) - 1;
+			}
+		}
 	}
 
 	@Override
