@@ -62,16 +62,6 @@ class RandomEllipsesMutation implements MutationPolicy {
 			ellipse.setup((int) ((ellipse.x1 + ellipse.x2) / 2.0),
 					(int) ((ellipse.y1 + ellipse.y2) / 2.0), theta);
 
-			// TODO Ellipse should not be outside of the image.
-			if (ellipse.x1 < 0 || ellipse.y1 < 0 || ellipse.x2 < 0
-					|| ellipse.y2 < 0 || ellipse.x1 >= image.getWidth()
-					|| ellipse.y1 >= image.getHeight()
-					|| ellipse.x2 >= image.getWidth()
-					|| ellipse.y2 >= image.getHeight()) {
-				ellipse.setup((int) (image.getWidth() / 2.0),
-						(int) (image.getHeight() / 2.0), theta);
-			}
-
 			values.add(ellipse);
 		}
 
