@@ -2,7 +2,17 @@
 
 It is an attempt to approximate full colors image with limited set of colors for simple ellipses.
 
-Acknowledgements
+## Build Instructions
+
+./gradlew jarAll
+
+## Run Examples
+
+java -jar Ellipses-Image-Approximator-all.jar ../../input/0001.jpg ../../output/ 31 100 3 19 000000 808080 C0C0C0 FFFFFF 800000 FF0000 808000 FFFF00 008000 00FF00 008080 00FFFF 000080 0000FF 800080 FF00FF
+ 
+java -jar Ellipses-Image-Approximator-all.jar ../../input/0009.jpg ../../output/ 11 7 19 5 000000 808080 C0C0C0 FFFFFF 800000 FF0000 808000 FFFF00 008000 00FF00 008080 00FFFF 000080 0000FF 800080 FF00FF
+
+## Acknowledgements
 
 This software is funded by Velbazhd Software LLC and it is partially supported by the Bulgarian Ministry of
 Education and Science (contract D01–205/23.11.2018) under the National Scientific Program "Information and
