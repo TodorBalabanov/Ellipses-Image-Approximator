@@ -6,8 +6,8 @@ import java.awt.geom.Line2D;
 import org.apache.commons.math3.util.Precision;
 
 class Ellipse implements Cloneable, GCode {
-	static int width;
-	static int height;
+	static int WIDTH = 0;
+	static int HEIGHT = 0;
 
 	int x1;
 	int y1;
@@ -17,10 +17,10 @@ class Ellipse implements Cloneable, GCode {
 	Line2D line;
 
 	void setup(int x, int y, double theta) {
-		x1 = (int) (width * Math.cos(theta + Math.PI) / 2.0D + x);
-		y1 = (int) (width * Math.sin(theta + Math.PI) / 2.0D + y);
-		x2 = (int) (width * Math.cos(theta) / 2.0D + x);
-		y2 = (int) (width * Math.sin(theta) / 2.0D + y);
+		x1 = (int) (WIDTH * Math.cos(theta + Math.PI) / 2.0D + x);
+		y1 = (int) (WIDTH * Math.sin(theta + Math.PI) / 2.0D + y);
+		x2 = (int) (WIDTH * Math.cos(theta) / 2.0D + x);
+		y2 = (int) (WIDTH * Math.sin(theta) / 2.0D + y);
 
 		line.setLine(x1, y1, x2, y2);
 	}

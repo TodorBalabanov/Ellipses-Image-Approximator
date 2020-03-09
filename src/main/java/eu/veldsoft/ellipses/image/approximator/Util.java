@@ -99,7 +99,7 @@ class Util {
 			List<Ellipse> ellipses) {
 		// TODO Implement colors merge in overlapping ellipses.
 		Graphics2D graphics = (Graphics2D) image.getGraphics();
-		graphics.setStroke(new BasicStroke(Ellipse.height,
+		graphics.setStroke(new BasicStroke(Ellipse.HEIGHT,
 				BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND));
 
 		for (Ellipse ellipse : ellipses) {
@@ -114,10 +114,7 @@ class Util {
 			Vector<Color> colors) {
 		Vector<Ellipse> ellipses = new Vector<Ellipse>();
 
-		/* Start with ellipse for each pixel. */
-		int numberOfEllipses = image.getWidth() * image.getHeight();
-
-		for (int i = 0, x, y; i < numberOfEllipses; i++) {
+		for (int i = 0, x, y; i < EllipseListChromosome.AVERAGE_LENGTH; i++) {
 			Color color = colors.elementAt(PRNG.nextInt(colors.size()));
 			x = PRNG.nextInt(image.getWidth());
 			y = PRNG.nextInt(image.getHeight());
@@ -159,9 +156,9 @@ class Util {
 			Vector<Color> colors, int populationSize) {
 		List<Chromosome> list = new LinkedList<Chromosome>();
 		for (int i = 0; i < populationSize; i++) {
-			list.add(new EllipseListChromosome(randomRepresentation(image,
-					colors,
-					image.getWidth() * image.getHeight()),
+			list.add(new EllipseListChromosome(
+					randomRepresentation(image, colors,
+							EllipseListChromosome.AVERAGE_LENGTH),
 					image, colors));
 		}
 		return new ElitisticListPopulation(list, 2 * list.size(), ELITISM_RATE);

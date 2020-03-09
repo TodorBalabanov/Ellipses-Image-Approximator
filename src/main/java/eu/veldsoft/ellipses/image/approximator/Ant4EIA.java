@@ -13,10 +13,9 @@ class Ant4EIA extends Ant {
 	private static final double Q0 = 0.8;
 	private static final double R = 0.1;
 
-	private static final Random PRNG = new Random(
-			System.currentTimeMillis());
+	private static final Random PRNG = new Random(System.currentTimeMillis());
 
-	protected Hashtable<Integer,Integer> nodesToVisit = new Hashtable<Integer, Integer>();
+	protected Hashtable<Integer, Integer> nodesToVisit = new Hashtable<Integer, Integer>();
 
 	@Override
 	protected boolean better(double value1, double value2) {
@@ -36,7 +35,7 @@ class Ant4EIA extends Ant {
 		/*
 		 * inizializza l'array di città da visitare
 		 */
-		nodesToVisit = new Hashtable<Integer,Integer>(graph.nodes());
+		nodesToVisit = new Hashtable<Integer, Integer>(graph.nodes());
 		for (int i = 0; i < graph.nodes(); i++)
 			nodesToVisit.put(new Integer(i), new Integer(i));
 
@@ -132,16 +131,15 @@ class Ant4EIA extends Ant {
 				/*
 				 * get the value of p as difined in eq. b)
 				 */
-				double p = (graph.tau(current, node) * Math.pow(
-						graph.etha(current, node), B))
-						/ sum;
+				double p = (graph.tau(current, node)
+						* Math.pow(graph.etha(current, node), B)) / sum;
 
 				/*
 				 * if the value of p is greater the the average value the node
 				 * is good
 				 */
-				if ((graph.tau(current, node) * Math.pow(
-						graph.etha(current, node), B)) > average) {
+				if ((graph.tau(current, node)
+						* Math.pow(graph.etha(current, node), B)) > average) {
 					max = node;
 				}
 			}

@@ -24,7 +24,8 @@ class HSVColorComparator implements ColorComparator {
 
 		// TODO return Math.sqrt(weightRed * red * red + weightGreen * green *
 		// green + weightBlue * blue * blue);
-		return (weightRed * deltaRed * deltaRed + weightGreen * deltaGreen
-				* deltaGreen + weightBlue * deltaBlue * deltaBlue);
+		return (weightRed * deltaRed * deltaRed
+				+ weightGreen * deltaGreen * deltaGreen
+				+ weightBlue * deltaBlue * deltaBlue);
 	}
 }

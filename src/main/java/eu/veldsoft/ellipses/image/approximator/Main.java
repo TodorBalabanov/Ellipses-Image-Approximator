@@ -21,18 +21,7 @@ public class Main {
 	private static BufferedImage original = null;
 
 	/**
-	 * java Main <image file name> <output folder> <population size> <evolution
-	 * time in secconds> <primitive width> <primitive height> <list of colors>
-	 * 
-	 * Example:
-	 * 
-	 * java -jar Ellipses-Image-Approximator-all.jar ../../input/0001.jpg
-	 * ../../output/ 31 100 3 19 000000 808080 C0C0C0 FFFFFF 800000 FF0000
-	 * 808000 FFFF00 008000 00FF00 008080 00FFFF 000080 0000FF 800080 FF00FF
-	 * 
-	 * java -jar Ellipses-Image-Approximator-all.jar ../../input/0009.jpg
-	 * ../../output/ 11 7 19 5 000000 808080 C0C0C0 FFFFFF 800000 FF0000 808000
-	 * FFFF00 008000 00FF00 008080 00FFFF 000080 0000FF 800080 FF00FF
+	 * Single entry point of the program.
 	 * 
 	 * @param args
 	 *            Command line parameters.
@@ -46,8 +35,8 @@ public class Main {
 
 		original = ImageIO.read(input);
 
-		Ellipse.width = Integer.valueOf(args[4]);
-		Ellipse.height = Integer.valueOf(args[5]);
+		Ellipse.WIDTH = Integer.valueOf(args[4]);
+		Ellipse.HEIGHT = Integer.valueOf(args[5]);
 
 		Vector<Color> colors = new Vector<Color>();
 		for (int i = 6; i < args.length; i++) {
@@ -55,6 +44,12 @@ public class Main {
 					Integer.parseInt(args[i], 16) | Util.ELLIPSES_ALPHA << 24,
 					true));
 		}
+
+		// TODO Should be some kind of external parameter. The area of the image
+		// divided by the area of the bounding rectangle of the simple graphic
+		// primitive is a good starting point.
+		EllipseListChromosome.AVERAGE_LENGTH = (original.getWidth()
+				* original.getHeight()) / (Ellipse.WIDTH * Ellipse.HEIGHT);
 
 		Population initial = Util.randomInitialPopulation(original, colors,
 				Integer.valueOf(args[2]));

@@ -15,7 +15,14 @@ import org.apache.commons.math3.genetics.InvalidRepresentationException;
 class EllipseListChromosome extends AbstractListChromosome<Ellipse>
 		implements
 			GCode {
+
+	/** The amount of simple primitives can float, but it has average size. */
+	static int AVERAGE_LENGTH = 0;
+
+	/** Reference to the original image */
 	private BufferedImage image = null;
+
+	/** Reference to the set of reduced colors. */
 	private Vector<Color> colors = null;
 
 	private List<Ellipse> sort() {
@@ -104,18 +111,18 @@ class EllipseListChromosome extends AbstractListChromosome<Ellipse>
 	@Override
 	protected void checkValidity(List<Ellipse> list)
 			throws InvalidRepresentationException {
-		if(list == null) {
+		if (list == null) {
 			return;
 		}
 
-		if(image == null) {
+		if (image == null) {
 			return;
 		}
 
-		/* Put all coordinates inside image dimentions. */ 
-		for(Ellipse ellipse : list) {
-			while (ellipse.x1 < 0 || ellipse.y1 < 0 || ellipse.x2 < 0 || ellipse.y2 < 0 
-					|| ellipse.x1 >= image.getWidth()
+		/* Put all coordinates inside image dimensions. */
+		for (Ellipse ellipse : list) {
+			while (ellipse.x1 < 0 || ellipse.y1 < 0 || ellipse.x2 < 0
+					|| ellipse.y2 < 0 || ellipse.x1 >= image.getWidth()
 					|| ellipse.y1 >= image.getHeight()
 					|| ellipse.x2 >= image.getWidth()
 					|| ellipse.y2 >= image.getHeight()) {

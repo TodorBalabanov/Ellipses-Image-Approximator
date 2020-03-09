@@ -1,7 +1,6 @@
 package eu.veldsoft.ellipses.image.approximator;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 import org.apache.commons.math3.exception.MathIllegalArgumentException;
@@ -51,7 +50,8 @@ class InstructionsCrossover implements CrossoverPolicy {
 			}
 		}
 
-		// TODO Shuffling may be is not needed, because sorting is done in evaluation phase.
+		// TODO Shuffling may be is not needed, because sorting is done in
+		// evaluation phase.
 		// Collections.shuffle(child1);
 		// Collections.shuffle(child2);
 

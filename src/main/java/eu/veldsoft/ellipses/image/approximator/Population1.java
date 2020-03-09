@@ -184,8 +184,8 @@ class Population1 {
 		Ellipse e = offspring.ellipses
 				.get(Util.PRNG.nextInt(offspring.ellipses.size()));
 
-		int dx = (int) (e.width * factor);
-		int dy = (int) (e.height * factor);
+		int dx = (int) (e.WIDTH * factor);
+		int dy = (int) (e.HEIGHT * factor);
 		double theta = 2 * Math.PI * Util.PRNG.nextDouble();
 
 		/*
