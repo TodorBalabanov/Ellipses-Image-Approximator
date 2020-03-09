@@ -19,6 +19,55 @@ import com.ugos.acs.AntGraph;
 
 public class Main {
 	private static BufferedImage original = null;
+	private static Vector<Color> colors = new Vector<Color>();
+
+	private static Population doGeneticAlgorithmOptimization(Population initial,
+			int time) {
+		GeneticAlgorithm algorithm = new GeneticAlgorithm(
+				new InstructionsCrossover(), Util.CROSSOVER_RATE,
+				new RandomEllipsesMutation(original, colors),
+				Util.MUTATION_RATE,
+				new TournamentSelection(Util.TOURNAMENT_ARITY));
+
+		Population optimized = algorithm.evolve(initial,
+				new FixedElapsedTime(time));
+
+		return optimized;
+	}
+
+	private static void doAntColonyOptimization(List<Ellipse> ellipses) {
+		/*
+		 * For ant colony graph.
+		 */
+		double neighbours[][] = new double[ellipses.size()][ellipses.size()];
+		for (int i = 0; i < ellipses.size(); i++) {
+			for (int j = 0; j < ellipses.size(); j++) {
+				/*
+				 * Node will not be connected to itself.
+				 */
+				if (i == j) {
+					neighbours[i][j] = 0;
+					continue;
+				}
+
+				// TODO Maybe other distance formula should be used.
+				neighbours[i][j] = Math.abs(ellipses.get(i).color.getRGB()
+						- ellipses.get(j).color.getRGB());
+				neighbours[j][i] = neighbours[i][j];
+			}
+		}
+		AntGraph graph = new AntGraph(ellipses.size(), neighbours);
+
+		/*
+		 * Run ant colony optimization.
+		 */
+		for (int i = 0; i < Util.NUMBER_OF_REPETITIONS; i++) {
+			graph.resetTau();
+			AntColony4EIA colony = new AntColony4EIA(graph, Util.NUMBER_OF_ANTS,
+					Util.NUMBER_OF_ITERATIONS);
+			colony.start();
+		}
+	}
 
 	/**
 	 * Single entry point of the program.
@@ -38,7 +87,7 @@ public class Main {
 		Ellipse.WIDTH = Integer.valueOf(args[4]);
 		Ellipse.HEIGHT = Integer.valueOf(args[5]);
 
-		Vector<Color> colors = new Vector<Color>();
+		colors.clear();
 		for (int i = 6; i < args.length; i++) {
 			colors.add(new Color(
 					Integer.parseInt(args[i], 16) | Util.ELLIPSES_ALPHA << 24,
@@ -48,69 +97,37 @@ public class Main {
 		// TODO Should be some kind of external parameter. The area of the image
 		// divided by the area of the bounding rectangle of the simple graphic
 		// primitive is a good starting point.
-		EllipseListChromosome.AVERAGE_LENGTH = (original.getWidth()
-				* original.getHeight()) / (Ellipse.WIDTH * Ellipse.HEIGHT);
+		EllipseListChromosome
+				.AVERAGE_LENGTH((original.getWidth() * original.getHeight())
+						/ (Ellipse.WIDTH * Ellipse.HEIGHT));
 
 		Population initial = Util.randomInitialPopulation(original, colors,
 				Integer.valueOf(args[2]));
+		Population optimized = initial;
 
 		/*
 		 * Report initial best solution.
 		 */
 		Util.writeSolution(original,
 				((EllipseListChromosome) initial.getFittestChromosome())
-						.getEllipses(),
+						.getSortedEllipses(),
 				path + System.currentTimeMillis() + ".png");
 		System.out.println("Optimization start ...");
 		System.out.write(
 				("Fitness: " + initial.getFittestChromosome().getFitness()
 						+ "\n").getBytes());
 
-		// TODO Crossover is for chromosomes with different length.
-		GeneticAlgorithm algorithm = new GeneticAlgorithm(
-				new InstructionsCrossover(), Util.CROSSOVER_RATE,
-				new RandomEllipsesMutation(original, colors),
-				Util.MUTATION_RATE,
-				new TournamentSelection(Util.TOURNAMENT_ARITY));
-		Population optimized = algorithm.evolve(initial,
-				new FixedElapsedTime(Integer.valueOf(args[3])));
+		boolean useGeneticAlgorithmOptimization = true;
+		if (useGeneticAlgorithmOptimization == true) {
+			optimized = doGeneticAlgorithmOptimization(initial,
+					Integer.valueOf(args[3]));
+		}
 
 		boolean useAntColonyOptimization = false;
 		if (useAntColonyOptimization == true) {
-			/*
-			 * For ant colony graph.
-			 */
-			List<Ellipse> ellipses = ((EllipseListChromosome) optimized
-					.getFittestChromosome()).getEllipses();
-			double neighbours[][] = new double[ellipses.size()][ellipses
-					.size()];
-			for (int i = 0; i < ellipses.size(); i++) {
-				for (int j = 0; j < ellipses.size(); j++) {
-					/*
-					 * Node will not be connected to itself.
-					 */
-					if (i == j) {
-						neighbours[i][j] = 0;
-						continue;
-					}
-
-					// TODO Maybe other distance formula should be used.
-					neighbours[i][j] = Math.abs(ellipses.get(i).color.getRGB()
-							- ellipses.get(j).color.getRGB());
-					neighbours[j][i] = neighbours[i][j];
-				}
-			}
-			AntGraph graph = new AntGraph(ellipses.size(), neighbours);
-
-			/*
-			 * Run ant colony optimization.
-			 */
-			for (int i = 0; i < Util.NUMBER_OF_REPETITIONS; i++) {
-				graph.resetTau();
-				AntColony4EIA colony = new AntColony4EIA(graph,
-						Util.NUMBER_OF_ANTS, Util.NUMBER_OF_ITERATIONS);
-				colony.start();
-			}
+			doAntColonyOptimization(
+					((EllipseListChromosome) optimized.getFittestChromosome())
+							.getEllipses());
 		}
 
 		/*
@@ -130,11 +147,11 @@ public class Main {
 		out.close();
 
 		/*
-		 * Report result.
+		 * Report best found solution.
 		 */
 		Util.writeSolution(original,
 				((EllipseListChromosome) optimized.getFittestChromosome())
-						.getEllipses(),
+						.getSortedEllipses(),
 				path + System.currentTimeMillis() + ".png");
 		System.out.println("Optimization end ...");
 		System.out.write(

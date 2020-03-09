@@ -17,13 +17,32 @@ class EllipseListChromosome extends AbstractListChromosome<Ellipse>
 			GCode {
 
 	/** The amount of simple primitives can float, but it has average size. */
-	static int AVERAGE_LENGTH = 0;
+	private static int AVERAGE_LENGTH = 0;
 
 	/** Reference to the original image */
 	private BufferedImage image = null;
 
 	/** Reference to the set of reduced colors. */
 	private Vector<Color> colors = null;
+
+	/**
+	 * @return The average length of the chromosome.
+	 */
+	public static int AVERAGE_LENGTH() {
+		return AVERAGE_LENGTH;
+	}
+
+	/**
+	 * @param averageLength
+	 *            The average length of the chromosome.
+	 */
+	public static void AVERAGE_LENGTH(int averageLength) {
+		if (averageLength < 0) {
+			averageLength = 0;
+		}
+
+		AVERAGE_LENGTH = averageLength;
+	}
 
 	private List<Ellipse> sort() {
 		/*
@@ -66,6 +85,8 @@ class EllipseListChromosome extends AbstractListChromosome<Ellipse>
 		super(representation);
 		this.image = image;
 		this.colors = colors;
+
+		checkValidity(getRepresentation());
 	}
 
 	public EllipseListChromosome(List<Ellipse> representation,
@@ -74,6 +95,8 @@ class EllipseListChromosome extends AbstractListChromosome<Ellipse>
 		super(representation);
 		this.image = image;
 		this.colors = colors;
+
+		checkValidity(getRepresentation());
 	}
 
 	public EllipseListChromosome(List<Ellipse> representation, boolean copy,
@@ -82,6 +105,8 @@ class EllipseListChromosome extends AbstractListChromosome<Ellipse>
 		super(representation, copy);
 		this.image = image;
 		this.colors = colors;
+
+		checkValidity(getRepresentation());
 	}
 
 	@Override
@@ -96,8 +121,7 @@ class EllipseListChromosome extends AbstractListChromosome<Ellipse>
 				image.getHeight(), BufferedImage.TYPE_INT_ARGB);
 		Util.drawEllipses(experimental, list);
 
-		// TODO Number of ellipses and images distance can be used with some
-		// coefficients.
+		/* Multiple-criteria for fitness value estimation. */
 		double size = list.size();
 		double distance = Util.distance(image, experimental);
 		double alpha = Util.alphaLevel(experimental, colors);
@@ -121,16 +145,50 @@ class EllipseListChromosome extends AbstractListChromosome<Ellipse>
 
 		/* Put all coordinates inside image dimensions. */
 		for (Ellipse ellipse : list) {
-			while (ellipse.x1 < 0 || ellipse.y1 < 0 || ellipse.x2 < 0
-					|| ellipse.y2 < 0 || ellipse.x1 >= image.getWidth()
-					|| ellipse.y1 >= image.getHeight()
-					|| ellipse.x2 >= image.getWidth()
-					|| ellipse.y2 >= image.getHeight()) {
-				ellipse.x1 += Util.PRNG.nextInt(3) - 1;
-				ellipse.y1 += Util.PRNG.nextInt(3) - 1;
-				ellipse.x2 += Util.PRNG.nextInt(3) - 1;
-				ellipse.y2 += Util.PRNG.nextInt(3) - 1;
+			int dx1, dx2, dy1, dy2;
+
+			dx1 = dx2 = dy1 = dy2 = 0;
+
+			if (ellipse.x1 < 0) {
+				dx1 = -ellipse.x1;
 			}
+			if (ellipse.x2 < 0) {
+				dx2 = -ellipse.x2;
+			}
+			if (ellipse.y1 < 0) {
+				dy1 = -ellipse.y1;
+			}
+			if (ellipse.y2 < 0) {
+				dy2 = -ellipse.y2;
+			}
+
+			ellipse.x1 += Math.max(dx1, dx2);
+			ellipse.x2 += Math.max(dx1, dx2);
+			ellipse.y1 += Math.max(dy1, dy2);
+			ellipse.y2 += Math.max(dy1, dy2);
+
+			dx1 = dx2 = dy1 = dy2 = 0;
+
+			if (ellipse.x1 >= image.getWidth()) {
+				dx1 = ellipse.x1 - image.getWidth() + 1;
+			}
+
+			if (ellipse.x2 >= image.getWidth()) {
+				dx2 = ellipse.x2 - image.getWidth() + 1;
+			}
+
+			if (ellipse.y1 >= image.getWidth()) {
+				dy1 = ellipse.y1 - image.getHeight() + 1;
+			}
+
+			if (ellipse.y2 >= image.getWidth()) {
+				dy2 = ellipse.y2 - image.getHeight() + 1;
+			}
+
+			ellipse.x1 -= Math.max(dx1, dx2);
+			ellipse.x2 -= Math.max(dx1, dx2);
+			ellipse.y1 -= Math.max(dy1, dy2);
+			ellipse.y2 -= Math.max(dy1, dy2);
 		}
 	}
 
@@ -141,6 +199,10 @@ class EllipseListChromosome extends AbstractListChromosome<Ellipse>
 	}
 
 	public List<Ellipse> getEllipses() {
+		return getRepresentation();
+	}
+
+	public List<Ellipse> getSortedEllipses() {
 		return sort();
 	}
 
@@ -153,12 +215,15 @@ class EllipseListChromosome extends AbstractListChromosome<Ellipse>
 	public String toGCode(Settings configuration) {
 		String gCode = "";
 
-		gCode += "(Solution with " + getFitness() + " as fitness value.)";
-		gCode += "\n";
-		gCode += "\n";
-
 		/* Sorting by colors is important for the plotting order. */
 		List<Ellipse> list = sort();
+
+		gCode += "(Solution with " + getFitness() + " as fitness value.)";
+		gCode += "\n";
+		gCode += "(Solution with " + list.size()
+				+ " number of primitive shapes.)";
+		gCode += "\n";
+		gCode += "\n";
 
 		/* Initialization of G Code script. */
 		Color color = list.get(0).color;

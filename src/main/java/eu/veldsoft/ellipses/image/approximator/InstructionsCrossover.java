@@ -50,11 +50,6 @@ class InstructionsCrossover implements CrossoverPolicy {
 			}
 		}
 
-		// TODO Shuffling may be is not needed, because sorting is done in
-		// evaluation phase.
-		// Collections.shuffle(child1);
-		// Collections.shuffle(child2);
-
 		return new ChromosomePair(
 				((EllipseListChromosome) first)
 						.newFixedLengthChromosome(child1),

@@ -27,15 +27,15 @@ class Util {
 
 	static boolean USE_PIXEL_INFOMATION = true;
 
-	static boolean COLORS_EVOTUION = true;
+	static boolean COLORS_EVOLUTION = true;
 
-	static int ELLIPSES_ALPHA = 127;
+	static int ELLIPSES_ALPHA = 0xAF;
 
 	static final double CROSSOVER_RATE = 0.9;
 
 	static final double MUTATION_RATE = 0.03;
 
-	static final double ELITISM_RATE = 0.1;
+	static final double ELITISM_RATE = 0.01;
 
 	static final int TOURNAMENT_ARITY = 2;
 
@@ -114,7 +114,7 @@ class Util {
 			Vector<Color> colors) {
 		Vector<Ellipse> ellipses = new Vector<Ellipse>();
 
-		for (int i = 0, x, y; i < EllipseListChromosome.AVERAGE_LENGTH; i++) {
+		for (int i = 0, x, y; i < EllipseListChromosome.AVERAGE_LENGTH(); i++) {
 			Color color = colors.elementAt(PRNG.nextInt(colors.size()));
 			x = PRNG.nextInt(image.getWidth());
 			y = PRNG.nextInt(image.getHeight());
@@ -158,7 +158,7 @@ class Util {
 		for (int i = 0; i < populationSize; i++) {
 			list.add(new EllipseListChromosome(
 					randomRepresentation(image, colors,
-							EllipseListChromosome.AVERAGE_LENGTH),
+							EllipseListChromosome.AVERAGE_LENGTH()),
 					image, colors));
 		}
 		return new ElitisticListPopulation(list, 2 * list.size(), ELITISM_RATE);

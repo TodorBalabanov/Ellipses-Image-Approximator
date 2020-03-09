@@ -174,25 +174,25 @@ class Population1 {
 			return;
 		}
 
-		if (Util.COLORS_EVOTUION == true) {
+		if (Util.COLORS_EVOLUTION == true) {
 			offspring.colors.setElementAt(
 					new Color(Util.PRNG.nextInt(0x1000000)),
 					Util.PRNG.nextInt(offspring.colors.size()));
 		}
 
 		double factor = Util.PRNG.nextDouble();
-		Ellipse e = offspring.ellipses
+		Ellipse ellipse = offspring.ellipses
 				.get(Util.PRNG.nextInt(offspring.ellipses.size()));
 
-		int dx = (int) (e.WIDTH * factor);
-		int dy = (int) (e.HEIGHT * factor);
+		int dx = (int) (ellipse.WIDTH * factor);
+		int dy = (int) (ellipse.HEIGHT * factor);
 		double theta = 2 * Math.PI * Util.PRNG.nextDouble();
 
 		/*
 		 * Mutate color in some cases by taking color of other ellipse.
 		 */
 		if (Util.PRNG.nextDouble() < factor) {
-			e.color = offspring.ellipses
+			ellipse.color = offspring.ellipses
 					.get(Util.PRNG.nextInt(offspring.ellipses.size())).color;
 		}
 
@@ -200,27 +200,29 @@ class Population1 {
 		 * Mutate positions.
 		 */
 		if (Util.PRNG.nextBoolean() == true) {
-			e.x1 -= dx;
+			ellipse.x1 -= dx;
 		} else {
-			e.x1 += dx;
+			ellipse.x1 += dx;
 		}
 		if (Util.PRNG.nextBoolean() == true) {
-			e.y1 -= dy;
+			ellipse.y1 -= dy;
 		} else {
-			e.y1 += dy;
+			ellipse.y1 += dy;
 		}
 
 		/*
 		 * Mutate rotation.
 		 */
-		e.setup((int) ((e.x1 + e.x2) / 2.0), (int) ((e.y1 + e.y2) / 2.0),
-				theta);
+		ellipse.setup((int) ((ellipse.x1 + ellipse.x2) / 2.0),
+				(int) ((ellipse.y1 + ellipse.y2) / 2.0), theta);
 
 		// TODO Ellipse should not be outside of the image.
-		if (e.x1 < 0 || e.y1 < 0 || e.x2 < 0 || e.y2 < 0
-				|| e.x1 >= image.getWidth() || e.y1 >= image.getHeight()
-				|| e.x2 >= image.getWidth() || e.y2 >= image.getHeight()) {
-			e.setup((int) (image.getWidth() / 2.0),
+		if (ellipse.x1 < 0 || ellipse.y1 < 0 || ellipse.x2 < 0 || ellipse.y2 < 0
+				|| ellipse.x1 >= image.getWidth()
+				|| ellipse.y1 >= image.getHeight()
+				|| ellipse.x2 >= image.getWidth()
+				|| ellipse.y2 >= image.getHeight()) {
+			ellipse.setup((int) (image.getWidth() / 2.0),
 					(int) (image.getHeight() / 2.0), theta);
 		}
 	}
