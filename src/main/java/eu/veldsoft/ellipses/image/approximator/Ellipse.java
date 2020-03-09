@@ -39,7 +39,7 @@ class Ellipse implements Cloneable, GCode {
 		y1 = ellipse.y1;
 		x2 = ellipse.x2;
 		y2 = ellipse.y2;
-		color = new Color(ellipse.color.getRGB());
+		color = ellipse.color;
 		line = new Line2D.Double(x1, y1, x2, y2);
 	}
 

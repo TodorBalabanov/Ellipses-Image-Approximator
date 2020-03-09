@@ -128,8 +128,12 @@ class EllipseListChromosome extends AbstractListChromosome<Ellipse>
 
 		// TODO Better handling of multiple criteria should be implemented. At
 		// least coefficients should be parameterized from outside.
-		return 0.001D / (1D + size) + 0.1D / (1D + distance)
-				+ 0.01D / (1D + alpha);
+
+		return -(1D * size + 100D * distance + 10D * alpha);
+
+		// return -(Math.pow(1D*size, 1)
+		// + Math.pow(100D*distance, 3)
+		// + Math.pow(10D*alpha, 2));
 	}
 
 	@Override
@@ -145,50 +149,35 @@ class EllipseListChromosome extends AbstractListChromosome<Ellipse>
 
 		/* Put all coordinates inside image dimensions. */
 		for (Ellipse ellipse : list) {
-			int dx1, dx2, dy1, dy2;
+			if (ellipse.x1 < 0 || ellipse.x2 < 0) {
+				int dx = 1 + Util.PRNG.nextInt(image.getWidth() / 2);
 
-			dx1 = dx2 = dy1 = dy2 = 0;
-
-			if (ellipse.x1 < 0) {
-				dx1 = -ellipse.x1;
-			}
-			if (ellipse.x2 < 0) {
-				dx2 = -ellipse.x2;
-			}
-			if (ellipse.y1 < 0) {
-				dy1 = -ellipse.y1;
-			}
-			if (ellipse.y2 < 0) {
-				dy2 = -ellipse.y2;
+				ellipse.x1 += dx;
+				ellipse.x2 += dx;
 			}
 
-			ellipse.x1 += Math.max(dx1, dx2);
-			ellipse.x2 += Math.max(dx1, dx2);
-			ellipse.y1 += Math.max(dy1, dy2);
-			ellipse.y2 += Math.max(dy1, dy2);
+			if (ellipse.y1 < 0 || ellipse.y2 < 0) {
+				int dy = 1 + Util.PRNG.nextInt(image.getHeight() / 2);
 
-			dx1 = dx2 = dy1 = dy2 = 0;
-
-			if (ellipse.x1 >= image.getWidth()) {
-				dx1 = ellipse.x1 - image.getWidth() + 1;
+				ellipse.y1 += dy;
+				ellipse.y2 += dy;
 			}
 
-			if (ellipse.x2 >= image.getWidth()) {
-				dx2 = ellipse.x2 - image.getWidth() + 1;
+			if (ellipse.x1 >= image.getWidth()
+					|| ellipse.x2 >= image.getWidth()) {
+				int dx = 1 + Util.PRNG.nextInt(image.getWidth() / 2);
+
+				ellipse.x1 -= dx;
+				ellipse.x2 -= dx;
 			}
 
-			if (ellipse.y1 >= image.getWidth()) {
-				dy1 = ellipse.y1 - image.getHeight() + 1;
-			}
+			if (ellipse.y1 >= image.getHeight()
+					|| ellipse.y2 >= image.getHeight()) {
+				int dy = 1 + Util.PRNG.nextInt(image.getHeight() / 2);
 
-			if (ellipse.y2 >= image.getWidth()) {
-				dy2 = ellipse.y2 - image.getHeight() + 1;
+				ellipse.y1 -= dy;
+				ellipse.y2 -= dy;
 			}
-
-			ellipse.x1 -= Math.max(dx1, dx2);
-			ellipse.x2 -= Math.max(dx1, dx2);
-			ellipse.y1 -= Math.max(dy1, dy2);
-			ellipse.y2 -= Math.max(dy1, dy2);
 		}
 	}
 

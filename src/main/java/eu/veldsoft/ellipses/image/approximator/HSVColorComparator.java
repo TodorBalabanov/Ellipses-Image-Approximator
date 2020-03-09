@@ -1,7 +1,5 @@
 package eu.veldsoft.ellipses.image.approximator;
 
-import java.awt.Color;
-
 class HSVColorComparator implements ColorComparator {
 	private double meanRed;
 	private int deltaRed;
@@ -11,16 +9,16 @@ class HSVColorComparator implements ColorComparator {
 	private double weightGreen;
 	private double weightBlue;
 
-	public double distance(Color a, Color b) {
-		meanRed = (a.getRed() + b.getRed()) / 2;
+	public double distance(int a, int b) {
+		meanRed = (((a >> 16) & 0xFF) + ((b >> 16) & 0xFF)) / 2D;
 
-		deltaRed = a.getRed() - b.getRed();
-		deltaGreen = a.getGreen() - b.getGreen();
-		deltaBlue = a.getBlue() - b.getBlue();
+		deltaRed = ((a >> 16) & 0xFF) - ((b >> 16) & 0xFF);
+		deltaGreen = ((a >> 8) & 0xFF) - ((b >> 8) & 0xFF);
+		deltaBlue = (a & 0xFF) - (b & 0xFF);
 
-		weightRed = 2 + meanRed / 256;
-		weightGreen = 4.0;
-		weightBlue = 2 + (255 - meanRed) / 256;
+		weightRed = 2D + meanRed / 256D;
+		weightGreen = 4D;
+		weightBlue = 2D + (255D - meanRed) / 256D;
 
 		// TODO return Math.sqrt(weightRed * red * red + weightGreen * green *
 		// green + weightBlue * blue * blue);

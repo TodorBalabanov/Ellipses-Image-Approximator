@@ -58,8 +58,8 @@ class Util {
 		int size = 0;
 		double sum = 0;
 		for (size = 0; size < aPixels.length && size < bPixels.length; size++) {
-			sum += euclidean.distance(new Color(aPixels[size]),
-					new Color(bPixels[size]));
+			sum += euclidean.distance(aPixels[size] & 0xFFFFFF,
+					bPixels[size] & 0xFFFFFF);
 		}
 
 		return sum / size;
@@ -72,8 +72,10 @@ class Util {
 
 		Color best = colors.get(0);
 		for (Color candidate : colors) {
-			if (euclidean.distance(color, candidate) < euclidean.distance(color,
-					best)) {
+			if (euclidean.distance(color.getRGB() & 0xFFFFFF,
+					candidate.getRGB() & 0xFFFFFF) < euclidean.distance(
+							color.getRGB() & 0xFFFFFF,
+							best.getRGB() & 0xFFFFFF)) {
 				best = candidate;
 			}
 		}
@@ -87,8 +89,11 @@ class Util {
 		int pixels[] = image.getRGB(0, 0, image.getWidth(), image.getHeight(),
 				null, 0, image.getWidth());
 		for (int i = 0; i < pixels.length; i++) {
-			if (colors.contains(new Color(pixels[i])) == false) {
-				level++;
+			for (Color color : colors) {
+				if (pixels[i] == color.getRGB()) {
+					level++;
+					break;
+				}
 			}
 		}
 

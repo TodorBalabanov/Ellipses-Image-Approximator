@@ -1,16 +1,14 @@
 package eu.veldsoft.ellipses.image.approximator;
 
-import java.awt.Color;
-
 class EuclideanColorComparator implements ColorComparator {
 	private double deltaRed;
 	private double deltaGreen;
 	private double deltaBlue;
 
-	public double distance(Color a, Color b) {
-		deltaRed = a.getRed() - b.getRed();
-		deltaGreen = a.getGreen() - b.getGreen();
-		deltaBlue = a.getBlue() - b.getBlue();
+	public double distance(int a, int b) {
+		deltaRed = ((a >> 16) & 0xFF) - ((b >> 16) & 0xFF);
+		deltaGreen = ((a >> 8) & 0xFF) - ((b >> 8) & 0xFF);
+		deltaBlue = (a & 0xFF) - (b & 0xFF);
 
 		return Math.sqrt(deltaRed * deltaRed + deltaGreen * deltaGreen
 				+ deltaBlue * deltaBlue);
