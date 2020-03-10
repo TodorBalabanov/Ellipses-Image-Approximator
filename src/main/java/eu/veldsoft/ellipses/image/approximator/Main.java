@@ -10,6 +10,12 @@ import java.util.Vector;
 
 import javax.imageio.ImageIO;
 
+import org.apache.commons.cli.CommandLine;
+import org.apache.commons.cli.CommandLineParser;
+import org.apache.commons.cli.DefaultParser;
+import org.apache.commons.cli.HelpFormatter;
+import org.apache.commons.cli.Option;
+import org.apache.commons.cli.Options;
 import org.apache.commons.math3.genetics.FixedElapsedTime;
 import org.apache.commons.math3.genetics.GeneticAlgorithm;
 import org.apache.commons.math3.genetics.Population;
@@ -70,6 +76,66 @@ public class Main {
 	}
 
 	/**
+	 * Print about information on the standard output.
+	 */
+	private static void printAbout() {
+		System.out.println(
+				"*******************************************************************************");
+		System.out.println(
+				"* Ellipses Image Approximator version 0.0.1                                   *");
+		System.out.println(
+				"* Copyrights (C) 2016-2020 Velbazhd Software LLC                              *");
+		System.out.println(
+				"*                                                                             *");
+		System.out.println(
+				"* developed by Todor Balabanov ( todor.balabanov@gmail.com )                  *");
+		System.out.println(
+				"* Sofia, Bulgaria                                                             *");
+		System.out.println(
+				"*                                                                             *");
+		System.out.println(
+				"* This software is partially supported by the Bulgarian Ministry of Education *");
+		System.out.println(
+				"* and Science (contract D01–205/23.11.2018) under the National Scientific     *");
+		System.out.println(
+				"* Program \"Information and Communication Technologies for a Single Digital    *");
+		System.out.println(
+				"* Market in Science, Education and Security (ICTinSES)\", approved by          *");
+		System.out.println(
+				"* DCM # 577/17.08.2018.                                                       *");
+		System.out.println(
+				"*                                                                             *");
+		System.out.println(
+				"* This program is free software: you can redistribute it and/or modify        *");
+		System.out.println(
+				"* it under the terms of the GNU General Public License as published by        *");
+		System.out.println(
+				"* the Free Software Foundation, either version 3 of the License, or           *");
+		System.out.println(
+				"* (at your option) any later version.                                         *");
+		System.out.println(
+				"*                                                                             *");
+		System.out.println(
+				"* This program is distributed in the hope that it will be useful,             *");
+		System.out.println(
+				"* but WITHOUT ANY WARRANTY; without even the implied warranty of              *");
+		System.out.println(
+				"* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the               *");
+		System.out.println(
+				"* GNU General Public License for more details.                                *");
+		System.out.println(
+				"*                                                                             *");
+		System.out.println(
+				"* You should have received a copy of the GNU General Public License           *");
+		System.out.println(
+				"* along with this program. If not, see <http://www.gnu.org/licenses/>.        *");
+		System.out.println(
+				"*                                                                             *");
+		System.out.println(
+				"*******************************************************************************");
+	}
+
+	/**
 	 * Single entry point of the program.
 	 * 
 	 * @param args
@@ -78,21 +144,101 @@ public class Main {
 	 *             Exception program stop.
 	 */
 	public static void main(String[] args) throws Exception {
-		File input = new File(args[0]);
-		File output = new File(args[1]);
+		/* Handling command line arguments with a library. */
+		Options options = new Options();
+
+		options.addOption(new Option("help", false, "Help screen."));
+
+		options.addOption(Option.builder("input").argName("file").hasArg()
+				.valueSeparator().desc("Image path and file name.").build());
+
+		options.addOption(Option.builder("output").argName("folder").hasArg()
+				.valueSeparator()
+				.desc("Output folder path (default value current folder).")
+				.build());
+
+		options.addOption(Option.builder("ellipse_width").argName("number")
+				.hasArg().valueSeparator()
+				.desc("Ellipse width (default value 1).").build());
+
+		options.addOption(Option.builder("ellipse_heigth").argName("number")
+				.hasArg().valueSeparator()
+				.desc("Ellipse heigth (default value 1).").build());
+
+		options.addOption(Option.builder("colors").argName("hex1,hex2,hex3,...")
+				.hasArg().valueSeparator()
+				.desc("Set of colors as comma separeated list of RGB hexadecimal numbers.")
+				.build());
+
+		/* Parse command line arguments. */
+		CommandLineParser parser = new DefaultParser();
+		CommandLine commands = parser.parse(options, args);
+
+		/* If help is requested print it and quit the program. */
+		if (commands.hasOption("help") == true) {
+			printAbout();
+			System.out.println();
+			(new HelpFormatter()).printHelp(
+					"java -jar Ellipses-Image-Approximator-all.jar", options,
+					true);
+			System.out.println();
+			System.exit(0);
+		}
+
+		/* Associate input file. */
+		File input = null;
+		if (commands.hasOption("input") == true) {
+			input = new File(commands.getOptionValue("input"));
+		} else {
+			System.out.println("Input file name is missing!");
+			System.out.println();
+			(new HelpFormatter()).printHelp(
+					"java -jar Ellipses-Image-Approximator-all.jar", options,
+					true);
+			System.out.println();
+			System.exit(0);
+		}
+
+		/* Associate output folder. */
+		File output = null;
+		if (commands.hasOption("output") == true) {
+			output = new File(commands.getOptionValue("output"));
+		} else {
+			output = new File(".");
+		}
 		String path = output.getCanonicalPath() + "/";
 
-		original = ImageIO.read(input);
-
-		Ellipse.WIDTH = Integer.valueOf(args[4]);
-		Ellipse.HEIGHT = Integer.valueOf(args[5]);
-
-		colors.clear();
-		for (int i = 6; i < args.length; i++) {
-			colors.add(new Color(
-					Integer.parseInt(args[i], 16) | Util.ELLIPSES_ALPHA << 24,
-					true));
+		/* Set ellipse width. */
+		if (commands.hasOption("ellipse_width") == true) {
+			Ellipse.WIDTH = Integer
+					.valueOf(commands.getOptionValue("ellipse_width"));
+		} else {
+			Ellipse.WIDTH = 1;
 		}
+
+		/* Set ellipse height. */
+		if (commands.hasOption("ellipse_height") == true) {
+			Ellipse.HEIGHT = Integer
+					.valueOf(commands.getOptionValue("ellipse_height"));
+		} else {
+			Ellipse.HEIGHT = 1;
+		}
+
+		// TODO Ellipse alpha value should be input argument.
+
+		/* Parse hexadecimal values for the colors.. */
+		colors.clear();
+		if (commands.hasOption("colors") == true) {
+			String[] values = commands.getOptionValue("colors").split(",");
+			for (String value : values) {
+				colors.add(new Color(
+						Integer.parseInt(value, 16) | Util.ELLIPSES_ALPHA << 24,
+						true));
+			}
+		}
+
+		/* Read input image. */
+		original = ImageIO.read(input);
 
 		// TODO Should be some kind of external parameter. The area of the image
 		// divided by the area of the bounding rectangle of the simple graphic
