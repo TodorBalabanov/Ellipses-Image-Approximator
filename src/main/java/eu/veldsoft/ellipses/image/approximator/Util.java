@@ -29,16 +29,6 @@ class Util {
 
 	static boolean COLORS_EVOLUTION = true;
 
-	static int ELLIPSES_ALPHA = 0xAF;
-
-	static final double CROSSOVER_RATE = 0.9;
-
-	static final double MUTATION_RATE = 0.03;
-
-	static final double ELITISM_RATE = 0.01;
-
-	static final int TOURNAMENT_ARITY = 2;
-
 	static final int NUMBER_OF_ANTS = 17;
 
 	static final int NUMBER_OF_ITERATIONS = 10;
@@ -158,7 +148,7 @@ class Util {
 	}
 
 	static Population randomInitialPopulation(BufferedImage image,
-			Vector<Color> colors, int populationSize) {
+			Vector<Color> colors, int populationSize, double elitismRate) {
 		List<Chromosome> list = new LinkedList<Chromosome>();
 		for (int i = 0; i < populationSize; i++) {
 			list.add(new EllipseListChromosome(
@@ -166,7 +156,7 @@ class Util {
 							EllipseListChromosome.AVERAGE_LENGTH()),
 					image, colors));
 		}
-		return new ElitisticListPopulation(list, 2 * list.size(), ELITISM_RATE);
+		return new ElitisticListPopulation(list, 2 * list.size(), elitismRate);
 	}
 
 	static void writeSolution(BufferedImage image, List<Ellipse> list,

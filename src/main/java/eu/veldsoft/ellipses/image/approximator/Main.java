@@ -28,12 +28,12 @@ public class Main {
 	private static Vector<Color> colors = new Vector<Color>();
 
 	private static Population doGeneticAlgorithmOptimization(Population initial,
+			double crossoverRate, double mutationRate, int tournamentArity,
 			int time) {
 		GeneticAlgorithm algorithm = new GeneticAlgorithm(
-				new InstructionsCrossover(), Util.CROSSOVER_RATE,
-				new RandomEllipsesMutation(original, colors),
-				Util.MUTATION_RATE,
-				new TournamentSelection(Util.TOURNAMENT_ARITY));
+				new InstructionsCrossover(), crossoverRate,
+				new RandomEllipsesMutation(original, colors), mutationRate,
+				new TournamentSelection(tournamentArity));
 
 		Population optimized = algorithm.evolve(initial,
 				new FixedElapsedTime(time));
@@ -149,6 +149,12 @@ public class Main {
 
 		options.addOption(new Option("help", false, "Help screen."));
 
+		options.addOption(new Option("ga", false,
+				"Switch on genetic algorithm optimization (default value off)."));
+
+		options.addOption(new Option("aco", false,
+				"Switch on ant colony optimization (default value off)."));
+
 		options.addOption(Option.builder("input").argName("file").hasArg()
 				.valueSeparator().desc("Image path and file name.").build());
 
@@ -161,13 +167,53 @@ public class Main {
 				.hasArg().valueSeparator()
 				.desc("Ellipse width (default value 1).").build());
 
-		options.addOption(Option.builder("ellipse_heigth").argName("number")
+		options.addOption(Option.builder("ellipse_height").argName("number")
 				.hasArg().valueSeparator()
-				.desc("Ellipse heigth (default value 1).").build());
+				.desc("Ellipse height (default value 1).").build());
+
+		options.addOption(Option.builder("ellipse_alpha").argName("number")
+				.hasArg().valueSeparator()
+				.desc("Ellipse alpha channel value between 0 and 255 (default value 255).")
+				.build());
 
 		options.addOption(Option.builder("colors").argName("hex1,hex2,hex3,...")
 				.hasArg().valueSeparator()
 				.desc("Set of colors as comma separeated list of RGB hexadecimal numbers.")
+				.build());
+
+		options.addOption(Option.builder("ga_population_size").argName("number")
+				.hasArg().valueSeparator()
+				.desc("Genetic algorithm population size (default value 0).")
+				.build());
+
+		options.addOption(Option.builder("ga_chromosome_size").argName("number")
+				.hasArg().valueSeparator()
+				.desc("Genetic algorithm chromosome average size (default value depends of the image size and ellipse size).")
+				.build());
+
+		options.addOption(Option.builder("ga_tournament_arity")
+				.argName("number").hasArg().valueSeparator()
+				.desc("Genetic algorithm tournament selection arity (default value 2).")
+				.build());
+
+		options.addOption(Option.builder("ga_crossover_rate").argName("number")
+				.hasArg().valueSeparator()
+				.desc("Genetic algorithm crossover rate from 0.0. to 1.0 (default value 0.9).")
+				.build());
+
+		options.addOption(Option.builder("ga_mutation_rate").argName("number")
+				.hasArg().valueSeparator()
+				.desc("Genetic algorithm mutation rate from 0.0. to 1.0 (default value 0.01).")
+				.build());
+
+		options.addOption(Option.builder("ga_elitism_rate").argName("number")
+				.hasArg().valueSeparator()
+				.desc("Genetic algorithm elitism rate from 0.0. to 1.0 (default value one individual).")
+				.build());
+
+		options.addOption(Option.builder("ga_optimization_time")
+				.argName("number").hasArg().valueSeparator()
+				.desc("Genetic algorithm optimization time in seconds (default value 0).")
 				.build());
 
 		/* Parse command line arguments. */
@@ -185,6 +231,18 @@ public class Main {
 			System.exit(0);
 		}
 
+		/* Switch on genetic algorithm optimization. */
+		boolean useGeneticAlgorithmOptimization = false;
+		if (commands.hasOption("ga") == true) {
+			useGeneticAlgorithmOptimization = true;
+		}
+
+		/* Switch on ant colony optimization. */
+		boolean useAntColonyOptimization = false;
+		if (commands.hasOption("aco") == true) {
+			useAntColonyOptimization = true;
+		}
+
 		/* Associate input file. */
 		File input = null;
 		if (commands.hasOption("input") == true) {
@@ -199,6 +257,9 @@ public class Main {
 			System.exit(0);
 		}
 
+		/* Read input image. */
+		original = ImageIO.read(input);
+
 		/* Associate output folder. */
 		File output = null;
 		if (commands.hasOption("output") == true) {
@@ -209,22 +270,25 @@ public class Main {
 		String path = output.getCanonicalPath() + "/";
 
 		/* Set ellipse width. */
+		Ellipse.WIDTH = 1;
 		if (commands.hasOption("ellipse_width") == true) {
 			Ellipse.WIDTH = Integer
 					.valueOf(commands.getOptionValue("ellipse_width"));
-		} else {
-			Ellipse.WIDTH = 1;
 		}
 
 		/* Set ellipse height. */
+		Ellipse.HEIGHT = 1;
 		if (commands.hasOption("ellipse_height") == true) {
 			Ellipse.HEIGHT = Integer
 					.valueOf(commands.getOptionValue("ellipse_height"));
-		} else {
-			Ellipse.HEIGHT = 1;
 		}
 
-		// TODO Ellipse alpha value should be input argument.
+		/* Ellipse alpha level. */
+		Ellipse.ALPHA = 0xFF;
+		if (commands.hasOption("ellipse_alpha") == true) {
+			Ellipse.ALPHA = Integer
+					.valueOf(commands.getOptionValue("ellipse_alpha"));
+		}
 
 		/* Parse hexadecimal values for the colors.. */
 		colors.clear();
@@ -232,23 +296,64 @@ public class Main {
 			String[] values = commands.getOptionValue("colors").split(",");
 			for (String value : values) {
 				colors.add(new Color(
-						Integer.parseInt(value, 16) | Util.ELLIPSES_ALPHA << 24,
+						Integer.parseInt(value, 16) | Ellipse.ALPHA << 24,
 						true));
 			}
 		}
 
-		/* Read input image. */
-		original = ImageIO.read(input);
+		/* Set population size for the genetic algorithm. */
+		int gaPopulationSize = 0;
+		if (commands.hasOption("ga_population_size") == true) {
+			gaPopulationSize = Integer
+					.valueOf(commands.getOptionValue("ga_population_size"));
+		}
 
-		// TODO Should be some kind of external parameter. The area of the image
-		// divided by the area of the bounding rectangle of the simple graphic
-		// primitive is a good starting point.
-		EllipseListChromosome
-				.AVERAGE_LENGTH((original.getWidth() * original.getHeight())
-						/ (Ellipse.WIDTH * Ellipse.HEIGHT));
+		/* Set chromosome average size for the genetic algorithm. */
+		int gaChromosomeAverageSize = (original.getWidth()
+				* original.getHeight()) / (Ellipse.WIDTH * Ellipse.HEIGHT);
+		if (commands.hasOption("ga_chromosome_size") == true) {
+			gaPopulationSize = Integer
+					.valueOf(commands.getOptionValue("ga_chromosome_size"));
+		}
 
+		/* Set genetic algorithm tournament selection arity. */
+		int gaTournamentArity = 2;
+		if (commands.hasOption("ga_tournament_arity") == true) {
+			gaTournamentArity = Integer
+					.valueOf(commands.getOptionValue("ga_tournament_arity"));
+		}
+
+		/* Set genetic algorithm crossover rate. */
+		double gaCrossoverRate = 0.9;
+		if (commands.hasOption("ga_crossover_rate") == true) {
+			gaCrossoverRate = Double
+					.valueOf(commands.getOptionValue("ga_crossover_rate"));
+		}
+
+		/* Set genetic algorithm mutation rate. */
+		double gaMutationRate = 0.01;
+		if (commands.hasOption("ga_mutation_rate") == true) {
+			gaMutationRate = Double
+					.valueOf(commands.getOptionValue("ga_mutation_rate"));
+		}
+
+		/* Set genetic algorithm elitism rate. */
+		double gaElitismRate = 1.0 / gaPopulationSize;
+		if (commands.hasOption("ga_elitism_rate") == true) {
+			gaElitismRate = Double
+					.valueOf(commands.getOptionValue("ga_elitism_rate"));
+		}
+
+		/* Set genetic algorithm optimization time. */
+		int gaOptimizationTime = 0;
+		if (commands.hasOption("ga_optimization_time") == true) {
+			gaOptimizationTime = Integer
+					.valueOf(commands.getOptionValue("ga_optimization_time"));
+		}
+
+		EllipseListChromosome.AVERAGE_LENGTH(gaChromosomeAverageSize);
 		Population initial = Util.randomInitialPopulation(original, colors,
-				Integer.valueOf(args[2]));
+				gaPopulationSize, gaElitismRate);
 		Population optimized = initial;
 
 		/*
@@ -263,13 +368,11 @@ public class Main {
 				("Fitness: " + initial.getFittestChromosome().getFitness()
 						+ "\n").getBytes());
 
-		boolean useGeneticAlgorithmOptimization = true;
 		if (useGeneticAlgorithmOptimization == true) {
-			optimized = doGeneticAlgorithmOptimization(initial,
-					Integer.valueOf(args[3]));
+			optimized = doGeneticAlgorithmOptimization(initial, gaCrossoverRate,
+					gaMutationRate, gaTournamentArity, gaOptimizationTime);
 		}
 
-		boolean useAntColonyOptimization = false;
 		if (useAntColonyOptimization == true) {
 			doAntColonyOptimization(
 					((EllipseListChromosome) optimized.getFittestChromosome())

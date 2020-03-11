@@ -8,9 +8,9 @@ It is an attempt to approximate full colors image with limited set of colors for
 
 ## Run Examples
 
-java -jar Ellipses-Image-Approximator-all.jar ../../input/0001.jpg ~/Desktop/ 31 100 3 19 000000 808080 C0C0C0 FFFFFF 800000 FF0000 808000 FFFF00 008000 00FF00 008080 00FFFF 000080 0000FF 800080 FF00FF
- 
-java -jar Ellipses-Image-Approximator-all.jar ../../input/0009.jpg ~/Desktop/ 11 7 19 5 000000 808080 C0C0C0 FFFFFF 800000 FF0000 808000 FFFF00 008000 00FF00 008080 00FFFF 000080 0000FF 800080 FF00FF
+java -jar Ellipses-Image-Approximator-all.jar -input ../../input/0001.jpg -output ~/Desktop/ -ellipse_width 3 -ellipse_height 19 -ellipse_alpha 216 -colors 000000,808080,C0C0C0,FFFFFF,800000,FF0000,808000,FFFF00,008000,00FF00,008080,00FFFF,000080,0000FF,800080,FF00FF -ga  -ga_population_size 31 -ga_chromosome_size 100 -ga_tournament_arity 2 -ga_crossover_rate 0.9 -ga_mutation_rate 0.1 -ga_elitism_rate 0.1 -ga_optimization_time 100
+
+java -jar Ellipses-Image-Approximator-all.jar -input ../../input/0009.jpg -output ~/Desktop/ -ellipse_width 5 -ellipse_height 19 -ellipse_alpha 216 -colors 000000,808080,C0C0C0,FFFFFF,800000,FF0000,808000,FFFF00,008000,00FF00,008080,00FFFF,000080,0000FF,800080,FF00FF -ga  -ga_population_size 11 -ga_chromosome_size 100 -ga_tournament_arity 2 -ga_crossover_rate 0.9 -ga_mutation_rate 0.1 -ga_elitism_rate 0.1 -ga_optimization_time 7
 
 ## Acknowledgements
 

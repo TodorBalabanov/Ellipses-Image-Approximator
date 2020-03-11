@@ -8,6 +8,7 @@ import org.apache.commons.math3.util.Precision;
 class Ellipse implements Cloneable, GCode {
 	static int WIDTH = 0;
 	static int HEIGHT = 0;
+	static int ALPHA = 0xFF;
 
 	int x1;
 	int y1;
