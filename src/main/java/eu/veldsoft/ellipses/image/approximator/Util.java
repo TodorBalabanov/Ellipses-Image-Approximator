@@ -25,16 +25,6 @@ class Util {
 
 	static int DEFAULT_THREAD_POOL_SIZE = 1;
 
-	static boolean USE_PIXEL_INFOMATION = true;
-
-	static boolean COLORS_EVOLUTION = true;
-
-	static final int NUMBER_OF_ANTS = 17;
-
-	static final int NUMBER_OF_ITERATIONS = 10;
-
-	static final int NUMBER_OF_REPETITIONS = 10;
-
 	static final ColorCoordinatesComparator usage = new ColorCoordinatesComparator();
 
 	static String log = "";
@@ -106,7 +96,7 @@ class Util {
 	}
 
 	static Vector<Ellipse> randomApproximatedEllipses(BufferedImage image,
-			Vector<Color> colors) {
+			Vector<Color> colors, boolean pixelClosestColor) {
 		Vector<Ellipse> ellipses = new Vector<Ellipse>();
 
 		for (int i = 0, x, y; i < EllipseListChromosome.AVERAGE_LENGTH(); i++) {
@@ -114,7 +104,7 @@ class Util {
 			x = PRNG.nextInt(image.getWidth());
 			y = PRNG.nextInt(image.getHeight());
 
-			if (USE_PIXEL_INFOMATION == true) {
+			if (pixelClosestColor == true) {
 				color = closestColor(new Color(image.getRGB(x, y)), colors);
 			}
 
@@ -127,7 +117,7 @@ class Util {
 	}
 
 	static List<Ellipse> randomRepresentation(BufferedImage image,
-			Vector<Color> colors, int length) {
+			Vector<Color> colors, boolean pixelClosestColor, int length) {
 		List<Ellipse> random = new ArrayList<Ellipse>();
 
 		for (int i = 0, x, y; i < length; i++) {
@@ -135,7 +125,7 @@ class Util {
 			x = PRNG.nextInt(image.getWidth());
 			y = PRNG.nextInt(image.getHeight());
 
-			if (USE_PIXEL_INFOMATION == true) {
+			if (pixelClosestColor == true) {
 				color = closestColor(new Color(image.getRGB(x, y)), colors);
 			}
 
@@ -148,11 +138,12 @@ class Util {
 	}
 
 	static Population randomInitialPopulation(BufferedImage image,
-			Vector<Color> colors, int populationSize, double elitismRate) {
+			Vector<Color> colors, boolean pixelClosestColor, int populationSize,
+			double elitismRate) {
 		List<Chromosome> list = new LinkedList<Chromosome>();
 		for (int i = 0; i < populationSize; i++) {
 			list.add(new EllipseListChromosome(
-					randomRepresentation(image, colors,
+					randomRepresentation(image, colors, pixelClosestColor,
 							EllipseListChromosome.AVERAGE_LENGTH()),
 					image, colors));
 		}

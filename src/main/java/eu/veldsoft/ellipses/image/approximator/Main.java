@@ -23,6 +23,8 @@ import org.apache.commons.math3.genetics.TournamentSelection;
 
 import com.ugos.acs.AntGraph;
 
+import eu.veldsoft.ellipses.image.approximator.GCode.Settings;
+
 public class Main {
 	private static BufferedImage original = null;
 	private static Vector<Color> colors = new Vector<Color>();
@@ -41,7 +43,8 @@ public class Main {
 		return optimized;
 	}
 
-	private static void doAntColonyOptimization(List<Ellipse> ellipses) {
+	private static void doAntColonyOptimization(List<Ellipse> ellipses,
+			int antsAmount, int repetitions, int iterations) {
 		/*
 		 * For ant colony graph.
 		 */
@@ -67,10 +70,10 @@ public class Main {
 		/*
 		 * Run ant colony optimization.
 		 */
-		for (int i = 0; i < Util.NUMBER_OF_REPETITIONS; i++) {
+		for (int i = 0; i < repetitions; i++) {
 			graph.resetTau();
-			AntColony4EIA colony = new AntColony4EIA(graph, Util.NUMBER_OF_ANTS,
-					Util.NUMBER_OF_ITERATIONS);
+			AntColony4EIA colony = new AntColony4EIA(graph, antsAmount,
+					iterations);
 			colony.start();
 		}
 	}
@@ -149,11 +152,17 @@ public class Main {
 
 		options.addOption(new Option("help", false, "Help screen."));
 
+		options.addOption(new Option("pixel_closest_color", false,
+				"Use RGB values of the pixels to match the best color from the set during the initialization of the population (default value false)."));
+
 		options.addOption(new Option("ga", false,
 				"Switch on genetic algorithm optimization (default value off)."));
 
 		options.addOption(new Option("aco", false,
 				"Switch on ant colony optimization (default value off)."));
+
+		options.addOption(new Option("g_code_print", false,
+				"Switch on G Code generation (default value off)."));
 
 		options.addOption(Option.builder("input").argName("file").hasArg()
 				.valueSeparator().desc("Image path and file name.").build());
@@ -179,6 +188,41 @@ public class Main {
 		options.addOption(Option.builder("colors").argName("hex1,hex2,hex3,...")
 				.hasArg().valueSeparator()
 				.desc("Set of colors as comma separeated list of RGB hexadecimal numbers.")
+				.build());
+
+		options.addOption(Option.builder("g_code_x_offset").argName("number").hasArg()
+				.valueSeparator()
+				.desc("X offset of the drawing area (default value 0).")
+				.build());
+
+		options.addOption(Option.builder("g_code_y_offset").argName("number").hasArg()
+				.valueSeparator()
+				.desc("Y offset of the drawing area (default value 0).")
+				.build());
+
+		options.addOption(Option.builder("g_code_x_down").argName("number").hasArg()
+				.valueSeparator()
+				.desc("Z down value (default value 0).")
+				.build());
+
+		options.addOption(Option.builder("g_code_x_up").argName("number").hasArg()
+				.valueSeparator()
+				.desc("Z up value (default value 0).")
+				.build());
+
+		options.addOption(Option.builder("g_code_scaling").argName("number").hasArg()
+				.valueSeparator()
+				.desc("Scaling factor image pixels to drawing area millimeters (default value 1.0).")
+				.build());
+
+		options.addOption(Option.builder("g_code_refill").argName("number")
+				.hasArg().valueSeparator()
+				.desc("Paint refill time in seconds (default value 0.0).")
+				.build());
+
+		options.addOption(Option.builder("g_code_color_change").argName("number")
+				.hasArg().valueSeparator()
+				.desc("Color setup change time in seconds (default value 0).")
 				.build());
 
 		options.addOption(Option.builder("ga_population_size").argName("number")
@@ -216,6 +260,21 @@ public class Main {
 				.desc("Genetic algorithm optimization time in seconds (default value 0).")
 				.build());
 
+		options.addOption(Option.builder("aco_ants_amount").argName("number")
+				.hasArg().valueSeparator()
+				.desc("Ant colony optimization number of ants (default value 0).")
+				.build());
+
+		options.addOption(Option.builder("aco_repetitions").argName("number")
+				.hasArg().valueSeparator()
+				.desc("Ant colony optimization number optimization repetitions (default value 0).")
+				.build());
+
+		options.addOption(Option.builder("aco_iterations").argName("number")
+				.hasArg().valueSeparator()
+				.desc("Ant colony optimization number iterations in single repetition (default value 0).")
+				.build());
+
 		/* Parse command line arguments. */
 		CommandLineParser parser = new DefaultParser();
 		CommandLine commands = parser.parse(options, args);
@@ -241,6 +300,12 @@ public class Main {
 		boolean useAntColonyOptimization = false;
 		if (commands.hasOption("aco") == true) {
 			useAntColonyOptimization = true;
+		}
+
+		/* Switch on ant colony optimization. */
+		boolean gCodeOutput = false;
+		if (commands.hasOption("g_code_print") == true) {
+			gCodeOutput = true;
 		}
 
 		/* Associate input file. */
@@ -301,6 +366,12 @@ public class Main {
 			}
 		}
 
+		/* Use pixels colors to estimate the most proper color of the set. */
+		boolean pixelClosestColor = false;
+		if (commands.hasOption("-pixel_closest_color") == true) {
+			pixelClosestColor = true;
+		}
+
 		/* Set population size for the genetic algorithm. */
 		int gaPopulationSize = 0;
 		if (commands.hasOption("ga_population_size") == true) {
@@ -351,9 +422,74 @@ public class Main {
 					.valueOf(commands.getOptionValue("ga_optimization_time"));
 		}
 
+		/* Number of ants in the graph. */
+		int acoAntsAmount = 0;
+		if (commands.hasOption("aco_ants_amount") == true) {
+			acoAntsAmount = Integer
+					.valueOf(commands.getOptionValue("aco_ants_amount"));
+		}
+
+		/* How many times the optimization to be executed. */
+		int acoRepetitions = 0;
+		if (commands.hasOption("aco_repetitions") == true) {
+			acoRepetitions = Integer
+					.valueOf(commands.getOptionValue("aco_repetitions"));
+		}
+
+		/* Number of iterations during single execution of the optimization. */
+		int acoIterations = 0;
+		if (commands.hasOption("aco_iterations") == true) {
+			acoIterations = Integer
+					.valueOf(commands.getOptionValue("aco_iterations"));
+		}
+
+		Settings settings = new GCode.Settings(0, 0, 0, 0, 0.0, 0.0, 0);
+
+		/* Painting offset by X axis. */
+		if (commands.hasOption("g_code_x_offset") == true) {
+			settings.xOffset = Integer
+					.valueOf(commands.getOptionValue("g_code_x_offset"));
+		}
+
+		/* Painting offset by Y axis. */
+		if (commands.hasOption("g_code_y_offset") == true) {
+			settings.yOffset = Integer
+					.valueOf(commands.getOptionValue("g_code_y_offset"));
+		}
+
+		/* Down value of Z axis. */
+		if (commands.hasOption("g_code_z_down") == true) {
+			settings.yOffset = Integer
+					.valueOf(commands.getOptionValue("g_code_z_down"));
+		}
+
+		/* Up value of Z axis. */
+		if (commands.hasOption("g_code_z_up") == true) {
+			settings.yOffset = Integer
+					.valueOf(commands.getOptionValue("g_code_z_up"));
+		}
+
+		/* Scaling factor between image size and painting area. */
+		if (commands.hasOption("g_code_scaling") == true) {
+			settings.penRefillTime = Double
+					.valueOf(commands.getOptionValue("g_code_scaling"));
+		}
+
+		/* Paint refill time in seconds. */
+		if (commands.hasOption("g_code_refill") == true) {
+			settings.penRefillTime = Double
+					.valueOf(commands.getOptionValue("g_code_refill_time"));
+		}
+
+		/* Color change time in seconds. */
+		if (commands.hasOption("g_code_color_change") == true) {
+			settings.colorChangeTime = Integer
+					.valueOf(commands.getOptionValue("g_code_color_change"));
+		}
+
 		EllipseListChromosome.AVERAGE_LENGTH(gaChromosomeAverageSize);
 		Population initial = Util.randomInitialPopulation(original, colors,
-				gaPopulationSize, gaElitismRate);
+				pixelClosestColor, gaPopulationSize, gaElitismRate);
 		Population optimized = initial;
 
 		/*
@@ -376,24 +512,21 @@ public class Main {
 		if (useAntColonyOptimization == true) {
 			doAntColonyOptimization(
 					((EllipseListChromosome) optimized.getFittestChromosome())
-							.getEllipses());
+							.getEllipses(),
+					acoAntsAmount, acoRepetitions, acoIterations);
 		}
 
 		/*
 		 * Print plotting instructions.
 		 */
-		BufferedOutputStream out = new BufferedOutputStream(
-				new FileOutputStream(
-						path + System.currentTimeMillis() + ".cnc"));
-		// TODO Test G Code generation with working area 200x200 millimeters.
-		out.write(
-				((EllipseListChromosome) optimized.getFittestChromosome())
-						.toGCode(new GCode.Settings(30, 30, 35, 15,
-								200.0 / Math.max(original.getWidth(),
-										original.getHeight()),
-								0.5, 600))
-						.getBytes());
-		out.close();
+		if (gCodeOutput == true) {
+			BufferedOutputStream out = new BufferedOutputStream(
+					new FileOutputStream(
+							path + System.currentTimeMillis() + ".cnc"));
+			out.write(((EllipseListChromosome) optimized.getFittestChromosome())
+					.toGCode(settings).getBytes());
+			out.close();
+		}
 
 		/*
 		 * Report best found solution.

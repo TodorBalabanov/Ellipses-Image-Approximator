@@ -23,6 +23,7 @@ class Population1 {
 	private Vector<Chromosome1> chromosomes = new Vector<Chromosome1>();
 	private BufferedImage image = null;
 	private BufferedImage experimental = null;
+	private boolean colorsEvolution = false;
 
 	public Population1(Population1 population) {
 		super();
@@ -41,7 +42,8 @@ class Population1 {
 		}
 	}
 
-	public Population1(int size, BufferedImage image, Vector<Color> colors) {
+	public Population1(int size, BufferedImage image, Vector<Color> colors,
+			boolean pixelClosestColor, boolean colorsEvolution) {
 		super();
 
 		this.image = image;
@@ -57,9 +59,8 @@ class Population1 {
 		 * Generate random population and evaluate chromosomes in it.
 		 */
 		for (int i = 0; i < size; i++) {
-			offspring = new Chromosome1(colors,
-					Util.randomApproximatedEllipses(image, colors),
-					Double.MAX_VALUE);
+			offspring = new Chromosome1(colors, Util.randomApproximatedEllipses(
+					image, colors, pixelClosestColor), Double.MAX_VALUE);
 			evaluate();
 			chromosomes.addElement(offspring);
 		}
@@ -74,6 +75,8 @@ class Population1 {
 				best = c;
 			}
 		}
+
+		this.colorsEvolution = colorsEvolution;
 	}
 
 	void select() {
@@ -174,7 +177,7 @@ class Population1 {
 			return;
 		}
 
-		if (Util.COLORS_EVOLUTION == true) {
+		if (colorsEvolution == true) {
 			offspring.colors.setElementAt(
 					new Color(Util.PRNG.nextInt(0x1000000)),
 					Util.PRNG.nextInt(offspring.colors.size()));
