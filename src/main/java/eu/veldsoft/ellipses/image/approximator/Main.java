@@ -200,12 +200,12 @@ public class Main {
 				.desc("Y offset of the drawing area (default value 0).")
 				.build());
 
-		options.addOption(Option.builder("g_code_x_down").argName("number").hasArg()
+		options.addOption(Option.builder("g_code_z_down").argName("number").hasArg()
 				.valueSeparator()
 				.desc("Z down value (default value 0).")
 				.build());
 
-		options.addOption(Option.builder("g_code_x_up").argName("number").hasArg()
+		options.addOption(Option.builder("g_code_z_up").argName("number").hasArg()
 				.valueSeparator()
 				.desc("Z up value (default value 0).")
 				.build());
@@ -368,7 +368,7 @@ public class Main {
 
 		/* Use pixels colors to estimate the most proper color of the set. */
 		boolean pixelClosestColor = false;
-		if (commands.hasOption("-pixel_closest_color") == true) {
+		if (commands.hasOption("pixel_closest_color") == true) {
 			pixelClosestColor = true;
 		}
 
@@ -478,7 +478,7 @@ public class Main {
 		/* Paint refill time in seconds. */
 		if (commands.hasOption("g_code_refill") == true) {
 			settings.penRefillTime = Double
-					.valueOf(commands.getOptionValue("g_code_refill_time"));
+					.valueOf(commands.getOptionValue("g_code_refill"));
 		}
 
 		/* Color change time in seconds. */
