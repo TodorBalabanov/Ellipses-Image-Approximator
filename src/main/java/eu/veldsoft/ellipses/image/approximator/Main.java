@@ -190,28 +190,26 @@ public class Main {
 				.desc("Set of colors as comma separeated list of RGB hexadecimal numbers.")
 				.build());
 
-		options.addOption(Option.builder("g_code_x_offset").argName("number").hasArg()
-				.valueSeparator()
+		options.addOption(Option.builder("g_code_x_offset").argName("number")
+				.hasArg().valueSeparator()
 				.desc("X offset of the drawing area (default value 0).")
 				.build());
 
-		options.addOption(Option.builder("g_code_y_offset").argName("number").hasArg()
-				.valueSeparator()
+		options.addOption(Option.builder("g_code_y_offset").argName("number")
+				.hasArg().valueSeparator()
 				.desc("Y offset of the drawing area (default value 0).")
 				.build());
 
-		options.addOption(Option.builder("g_code_z_down").argName("number").hasArg()
-				.valueSeparator()
-				.desc("Z down value (default value 0).")
+		options.addOption(Option.builder("g_code_z_down").argName("number")
+				.hasArg().valueSeparator()
+				.desc("Z down value (default value 0).").build());
+
+		options.addOption(Option.builder("g_code_z_up").argName("number")
+				.hasArg().valueSeparator().desc("Z up value (default value 0).")
 				.build());
 
-		options.addOption(Option.builder("g_code_z_up").argName("number").hasArg()
-				.valueSeparator()
-				.desc("Z up value (default value 0).")
-				.build());
-
-		options.addOption(Option.builder("g_code_scaling").argName("number").hasArg()
-				.valueSeparator()
+		options.addOption(Option.builder("g_code_scaling").argName("number")
+				.hasArg().valueSeparator()
 				.desc("Scaling factor image pixels to drawing area millimeters (default value 1.0).")
 				.build());
 
@@ -220,8 +218,8 @@ public class Main {
 				.desc("Paint refill time in seconds (default value 0.0).")
 				.build());
 
-		options.addOption(Option.builder("g_code_color_change").argName("number")
-				.hasArg().valueSeparator()
+		options.addOption(Option.builder("g_code_color_change")
+				.argName("number").hasArg().valueSeparator()
 				.desc("Color setup change time in seconds (default value 0).")
 				.build());
 
@@ -459,19 +457,19 @@ public class Main {
 
 		/* Down value of Z axis. */
 		if (commands.hasOption("g_code_z_down") == true) {
-			settings.yOffset = Integer
+			settings.zDown = Integer
 					.valueOf(commands.getOptionValue("g_code_z_down"));
 		}
 
 		/* Up value of Z axis. */
 		if (commands.hasOption("g_code_z_up") == true) {
-			settings.yOffset = Integer
+			settings.zUp = Integer
 					.valueOf(commands.getOptionValue("g_code_z_up"));
 		}
 
 		/* Scaling factor between image size and painting area. */
 		if (commands.hasOption("g_code_scaling") == true) {
-			settings.penRefillTime = Double
+			settings.scale = Double
 					.valueOf(commands.getOptionValue("g_code_scaling"));
 		}
 
