@@ -51,17 +51,23 @@ class Util {
 			return color;
 		}
 
-		Color best = colors.get(0);
-		for (Color candidate : colors) {
-			if (euclidean.distance(color.getRGB() & 0xFFFFFF,
-					candidate.getRGB() & 0xFFFFFF) < euclidean.distance(
-							color.getRGB() & 0xFFFFFF,
-							best.getRGB() & 0xFFFFFF)) {
-				best = candidate;
+		Color candidate, bestColor = colors.get(0);
+		double distance,
+				bestDistance = euclidean.distance(color.getRGB() & 0xFFFFFF,
+						bestColor.getRGB() & 0xFFFFFF);
+
+		for (int i = colors.size(); i > 0; i--) {
+			candidate = colors.get(i);
+			distance = euclidean.distance(color.getRGB() & 0xFFFFFF,
+					candidate.getRGB() & 0xFFFFFF);
+
+			if (distance < bestDistance) {
+				bestColor = candidate;
+				bestDistance = distance;
 			}
 		}
 
-		return best;
+		return bestColor;
 	}
 
 	static double alphaLevel(BufferedImage image, Vector<Color> colors) {

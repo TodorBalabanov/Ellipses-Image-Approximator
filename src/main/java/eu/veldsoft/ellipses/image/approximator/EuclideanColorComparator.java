@@ -1,9 +1,9 @@
 package eu.veldsoft.ellipses.image.approximator;
 
 class EuclideanColorComparator implements ColorComparator {
-	private double deltaRed;
-	private double deltaGreen;
-	private double deltaBlue;
+	private int deltaRed;
+	private int deltaGreen;
+	private int deltaBlue;
 
 	public double distance(int a, int b) {
 		deltaRed = ((a >> 16) & 0xFF) - ((b >> 16) & 0xFF);
