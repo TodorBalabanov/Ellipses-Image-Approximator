@@ -10,6 +10,8 @@ class EuclideanColorComparator implements ColorComparator {
 		deltaGreen = ((a >> 8) & 0xFF) - ((b >> 8) & 0xFF);
 		deltaBlue = (a & 0xFF) - (b & 0xFF);
 
+		// return deltaRed * deltaRed + deltaGreen * deltaGreen
+		// + deltaBlue * deltaBlue;
 		return Math.sqrt(deltaRed * deltaRed + deltaGreen * deltaGreen
 				+ deltaBlue * deltaBlue);
 	}

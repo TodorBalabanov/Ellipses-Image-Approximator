@@ -4,6 +4,7 @@ import java.awt.Color;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Vector;
 
 import org.apache.commons.math3.genetics.Chromosome;
@@ -11,10 +12,13 @@ import org.apache.commons.math3.genetics.MutationPolicy;
 
 class RandomEllipsesMutation implements MutationPolicy {
 	private BufferedImage image = null;
+	private Map<String, Integer> histogram = null;
 	private Vector<Color> colors = null;
 
-	public RandomEllipsesMutation(BufferedImage image, Vector<Color> colors) {
+	public RandomEllipsesMutation(BufferedImage image,
+			Map<String, Integer> histogram, Vector<Color> colors) {
 		this.image = image;
+		this.histogram = histogram;
 		this.colors = colors;
 	}
 
@@ -65,6 +69,6 @@ class RandomEllipsesMutation implements MutationPolicy {
 			values.add(ellipse);
 		}
 
-		return new EllipseListChromosome(values, image, colors);
+		return new EllipseListChromosome(values, image, histogram, colors);
 	}
 }

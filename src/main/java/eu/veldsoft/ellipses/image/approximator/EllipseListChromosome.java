@@ -4,7 +4,6 @@ import java.awt.Color;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Vector;
@@ -19,8 +18,11 @@ class EllipseListChromosome extends AbstractListChromosome<Ellipse>
 	/** The amount of simple primitives can float, but it has average size. */
 	private static int AVERAGE_LENGTH = 0;
 
-	/** Reference to the original image */
+	/** Reference to the original image. */
 	private BufferedImage image = null;
+
+	/** Reference to the original image histogram. */
+	private Map<String, Integer> histogram = null;
 
 	/** Reference to the set of reduced colors. */
 	private Vector<Color> colors = null;
@@ -45,25 +47,8 @@ class EllipseListChromosome extends AbstractListChromosome<Ellipse>
 	}
 
 	private List<Ellipse> sort() {
-		/*
-		 * Calculate the most used colors from the original picture.
-		 */
-		Map<String, Integer> histogram = new HashMap<String, Integer>();
-		int pixels[] = image.getRGB(0, 0, image.getWidth(), image.getHeight(),
-				null, 0, image.getWidth());
-		for (int i = 0; i < pixels.length; i++) {
-			Color color = new Color(pixels[i]);
-			color = Util.closestColor(color, colors);
-			// TODO It is not clear that mapping to the closest color is the
-			// correct way of histogram calculation.
-
-			if (histogram.containsKey(color.toString()) == false) {
-				histogram.put(color.toString(), 1);
-			} else {
-				histogram.put(color.toString(),
-						histogram.get(color.toString()) + 1);
-			}
-		}
+		// TODO When set of colors is also optimized the histogram should be
+		// calculated each time when colors set is changed.
 
 		/*
 		 * Sort according color usage and x-y coordinates. The most used colors
@@ -81,29 +66,33 @@ class EllipseListChromosome extends AbstractListChromosome<Ellipse>
 	}
 
 	public EllipseListChromosome(Ellipse[] representation, BufferedImage image,
-			Vector<Color> colors) throws InvalidRepresentationException {
+			Map<String, Integer> histogram, Vector<Color> colors)
+			throws InvalidRepresentationException {
 		super(representation);
 		this.image = image;
+		this.histogram = histogram;
 		this.colors = colors;
 
 		checkValidity(getRepresentation());
 	}
 
 	public EllipseListChromosome(List<Ellipse> representation,
-			BufferedImage image, Vector<Color> colors)
-			throws InvalidRepresentationException {
+			BufferedImage image, Map<String, Integer> histogram,
+			Vector<Color> colors) throws InvalidRepresentationException {
 		super(representation);
 		this.image = image;
+		this.histogram = histogram;
 		this.colors = colors;
 
 		checkValidity(getRepresentation());
 	}
 
 	public EllipseListChromosome(List<Ellipse> representation, boolean copy,
-			BufferedImage image, Vector<Color> colors)
-			throws InvalidRepresentationException {
+			BufferedImage image, Map<String, Integer> histogram,
+			Vector<Color> colors) throws InvalidRepresentationException {
 		super(representation, copy);
 		this.image = image;
+		this.histogram = histogram;
 		this.colors = colors;
 
 		checkValidity(getRepresentation());
@@ -184,7 +173,7 @@ class EllipseListChromosome extends AbstractListChromosome<Ellipse>
 	@Override
 	public EllipseListChromosome newFixedLengthChromosome(List<Ellipse> list) {
 		// TODO Make a deep copy.
-		return new EllipseListChromosome(list, true, image, colors);
+		return new EllipseListChromosome(list, true, image, histogram, colors);
 	}
 
 	public List<Ellipse> getEllipses() {

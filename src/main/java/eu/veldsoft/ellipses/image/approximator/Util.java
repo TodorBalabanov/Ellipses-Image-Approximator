@@ -9,6 +9,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.Random;
 import java.util.Vector;
 
@@ -138,14 +139,14 @@ class Util {
 	}
 
 	static Population randomInitialPopulation(BufferedImage image,
-			Vector<Color> colors, boolean pixelClosestColor, int populationSize,
-			double elitismRate) {
+			Map<String, Integer> histogram, Vector<Color> colors,
+			boolean pixelClosestColor, int populationSize, double elitismRate) {
 		List<Chromosome> list = new LinkedList<Chromosome>();
 		for (int i = 0; i < populationSize; i++) {
 			list.add(new EllipseListChromosome(
 					randomRepresentation(image, colors, pixelClosestColor,
 							EllipseListChromosome.AVERAGE_LENGTH()),
-					image, colors));
+					image, histogram, colors));
 		}
 		return new ElitisticListPopulation(list, 2 * list.size(), elitismRate);
 	}

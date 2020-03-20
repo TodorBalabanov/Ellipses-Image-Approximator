@@ -5,7 +5,9 @@ import java.awt.image.BufferedImage;
 import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Vector;
 
 import javax.imageio.ImageIO;
@@ -27,6 +29,7 @@ import eu.veldsoft.ellipses.image.approximator.GCode.Settings;
 
 public class Main {
 	private static BufferedImage original = null;
+	private static Map<String, Integer> histogram = new HashMap<String, Integer>();
 	private static Vector<Color> colors = new Vector<Color>();
 
 	private static Population doGeneticAlgorithmOptimization(Population initial,
@@ -34,8 +37,8 @@ public class Main {
 			int time) {
 		GeneticAlgorithm algorithm = new GeneticAlgorithm(
 				new InstructionsCrossover(), crossoverRate,
-				new RandomEllipsesMutation(original, colors), mutationRate,
-				new TournamentSelection(tournamentArity));
+				new RandomEllipsesMutation(original, histogram, colors),
+				mutationRate, new TournamentSelection(tournamentArity));
 
 		Population optimized = algorithm.evolve(initial,
 				new FixedElapsedTime(time));
@@ -323,6 +326,25 @@ public class Main {
 		/* Read input image. */
 		original = ImageIO.read(input);
 
+		/*
+		 * Calculate the most used colors from the original picture.
+		 */
+		int pixels[] = original.getRGB(0, 0, original.getWidth(),
+				original.getHeight(), null, 0, original.getWidth());
+		for (int i = 0; i < pixels.length; i++) {
+			Color color = new Color(pixels[i]);
+			color = Util.closestColor(color, colors);
+			// TODO It is not clear that mapping to the closest color is the
+			// correct way of histogram calculation.
+
+			if (histogram.containsKey(color.toString()) == false) {
+				histogram.put(color.toString(), 1);
+			} else {
+				histogram.put(color.toString(),
+						histogram.get(color.toString()) + 1);
+			}
+		}
+
 		/* Associate output folder. */
 		File output = null;
 		if (commands.hasOption("output") == true) {
@@ -486,8 +508,8 @@ public class Main {
 		}
 
 		EllipseListChromosome.AVERAGE_LENGTH(gaChromosomeAverageSize);
-		Population initial = Util.randomInitialPopulation(original, colors,
-				pixelClosestColor, gaPopulationSize, gaElitismRate);
+		Population initial = Util.randomInitialPopulation(original, histogram,
+				colors, pixelClosestColor, gaPopulationSize, gaElitismRate);
 		Population optimized = initial;
 
 		/*
