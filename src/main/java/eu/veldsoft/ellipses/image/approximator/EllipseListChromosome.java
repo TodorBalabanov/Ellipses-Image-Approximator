@@ -118,11 +118,11 @@ class EllipseListChromosome extends AbstractListChromosome<Ellipse>
 		// TODO Better handling of multiple criteria should be implemented. At
 		// least coefficients should be parameterized from outside.
 
-		return -(1D * size + 100D * distance + 10D * alpha);
+		// return 1D / size;
+		// return 1D / distance;
+		// return 1D / alpha;
 
-		// return -(Math.pow(1D*size, 1)
-		// + Math.pow(100D*distance, 3)
-		// + Math.pow(10D*alpha, 2));
+		return 1D / size + 1D / distance + 1D / alpha;
 	}
 
 	@Override
@@ -195,6 +195,9 @@ class EllipseListChromosome extends AbstractListChromosome<Ellipse>
 
 		/* Sorting by colors is important for the plotting order. */
 		List<Ellipse> list = sort();
+		if (list.size() == 0) {
+			return gCode;
+		}
 
 		gCode += "(Solution with " + getFitness() + " as fitness value.)";
 		gCode += "\n";

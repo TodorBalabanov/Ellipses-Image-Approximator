@@ -403,7 +403,7 @@ public class Main {
 		int gaChromosomeAverageSize = (original.getWidth()
 				* original.getHeight()) / (Ellipse.WIDTH() * Ellipse.HEIGHT());
 		if (commands.hasOption("ga_chromosome_size") == true) {
-			gaPopulationSize = Integer
+			gaChromosomeAverageSize = Integer
 					.valueOf(commands.getOptionValue("ga_chromosome_size"));
 		}
 

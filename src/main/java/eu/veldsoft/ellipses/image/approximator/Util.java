@@ -72,28 +72,30 @@ class Util {
 	}
 
 	static double alphaLevel(BufferedImage image, Vector<Color> colors) {
-		double level = 0;
+		int level = 0;
 
 		int pixels[] = image.getRGB(0, 0, image.getWidth(), image.getHeight(),
 				null, 0, image.getWidth());
 		for (int i = 0; i < pixels.length; i++) {
-			for (Color color : colors) {
-				if (pixels[i] == color.getRGB()) {
-					level++;
-					break;
-				}
+			if (pixels[i] == 0x01FFFFFF) {
+				level++;
 			}
 		}
 
-		return level / pixels.length;
+		return (double) level / (double) pixels.length;
 	}
 
 	static BufferedImage drawEllipses(BufferedImage image,
 			List<Ellipse> ellipses) {
 		// TODO Implement colors merge in overlapping ellipses.
-		Graphics2D graphics = (Graphics2D) image.getGraphics();
-		graphics.setStroke(Ellipse.STROKE);
 
+		Graphics2D graphics = (Graphics2D) image.getGraphics();
+
+		/* Fill with light background. */
+		graphics.setColor(new Color(0xFF, 0xFF, 0xFF, 0x01));
+		graphics.fillRect(0, 0, image.getWidth(), image.getHeight());
+
+		graphics.setStroke(Ellipse.STROKE);
 		for (Ellipse ellipse : ellipses) {
 			graphics.setColor(ellipse.color);
 			graphics.draw(ellipse.line);
