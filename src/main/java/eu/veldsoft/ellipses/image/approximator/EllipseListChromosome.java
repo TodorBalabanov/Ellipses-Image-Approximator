@@ -111,18 +111,17 @@ class EllipseListChromosome extends AbstractListChromosome<Ellipse>
 		Util.drawEllipses(experimental, list);
 
 		/* Multiple-criteria for fitness value estimation. */
-		double size = list.size();
+		// double size = list.size();
 		double distance = Util.distance(image, experimental);
-		double alpha = Util.alphaLevel(experimental, colors);
+		// double alpha = Util.alphaLevel(experimental, colors);
+
+		// return 1D / size;
+		return 1D / distance;
+		// return 1D / alpha;
+		// return 1D / size + 1D / distance + 1D / alpha;
 
 		// TODO Better handling of multiple criteria should be implemented. At
 		// least coefficients should be parameterized from outside.
-
-		// return 1D / size;
-		// return 1D / distance;
-		// return 1D / alpha;
-
-		return 1D / size + 1D / distance + 1D / alpha;
 	}
 
 	@Override
