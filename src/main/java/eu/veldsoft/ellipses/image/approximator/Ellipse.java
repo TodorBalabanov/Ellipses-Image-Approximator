@@ -1,14 +1,17 @@
 package eu.veldsoft.ellipses.image.approximator;
 
+import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.geom.Line2D;
 
 import org.apache.commons.math3.util.Precision;
 
 class Ellipse implements Cloneable, GCode {
-	static int WIDTH = 0;
-	static int HEIGHT = 0;
-	static int ALPHA = 0xFF;
+	private static int WIDTH = 0;
+	private static int HEIGHT = 0;
+	private static int ALPHA = 0xFF;
+
+	static BasicStroke STROKE = null;
 
 	int x1;
 	int y1;
@@ -16,6 +19,57 @@ class Ellipse implements Cloneable, GCode {
 	int y2;
 	Color color;
 	Line2D line;
+
+	/**
+	 * @return The width of the ellipse.
+	 */
+	public static int WIDTH() {
+		return WIDTH;
+	}
+
+	/**
+	 * @param width
+	 *            The width of the ellipse.
+	 */
+	public static void WIDTH(int width) {
+		WIDTH = width;
+
+		STROKE = new BasicStroke(Ellipse.HEIGHT, BasicStroke.CAP_ROUND,
+				BasicStroke.JOIN_ROUND);
+	}
+
+	/**
+	 * @return The height of the ellipse.
+	 */
+	public static int HEIGHT() {
+		return HEIGHT;
+	}
+
+	/**
+	 * @param height
+	 *            Height of the ellipse.
+	 */
+	public static void HEIGHT(int height) {
+		HEIGHT = height;
+
+		STROKE = new BasicStroke(Ellipse.HEIGHT, BasicStroke.CAP_ROUND,
+				BasicStroke.JOIN_ROUND);
+	}
+
+	/**
+	 * @return Alpha value of the color.
+	 */
+	public static int ALPHA() {
+		return ALPHA;
+	}
+
+	/**
+	 * @param alpha
+	 *            Alpha value of the color.
+	 */
+	public static void ALPHA(int alpha) {
+		ALPHA = alpha;
+	}
 
 	void setup(int x, int y, double theta) {
 		x1 = (int) (WIDTH * Math.cos(theta + Math.PI) / 2.0D + x);

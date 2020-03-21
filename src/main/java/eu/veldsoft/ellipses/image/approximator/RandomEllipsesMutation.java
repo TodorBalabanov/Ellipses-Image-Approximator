@@ -32,8 +32,8 @@ class RandomEllipsesMutation implements MutationPolicy {
 
 		List<Ellipse> values = new ArrayList<Ellipse>();
 		for (Ellipse value : ((EllipseListChromosome) original).getEllipses()) {
-			int dx = (int) (Ellipse.WIDTH * factor);
-			int dy = (int) (Ellipse.HEIGHT * factor);
+			int dx = (int) (Ellipse.WIDTH() * factor);
+			int dy = (int) (Ellipse.HEIGHT() * factor);
 			double theta = 2 * Math.PI * Util.PRNG.nextDouble();
 
 			Ellipse ellipse = new Ellipse(value);

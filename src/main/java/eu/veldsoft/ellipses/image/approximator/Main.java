@@ -355,24 +355,24 @@ public class Main {
 		String path = output.getCanonicalPath() + "/";
 
 		/* Set ellipse width. */
-		Ellipse.WIDTH = 1;
+		Ellipse.WIDTH( 1 );
 		if (commands.hasOption("ellipse_width") == true) {
-			Ellipse.WIDTH = Integer
-					.valueOf(commands.getOptionValue("ellipse_width"));
+			Ellipse.WIDTH( Integer
+					.valueOf(commands.getOptionValue("ellipse_width")));
 		}
 
 		/* Set ellipse height. */
-		Ellipse.HEIGHT = 1;
+		Ellipse.HEIGHT( 1 );
 		if (commands.hasOption("ellipse_height") == true) {
-			Ellipse.HEIGHT = Integer
-					.valueOf(commands.getOptionValue("ellipse_height"));
+			Ellipse.HEIGHT( Integer
+					.valueOf(commands.getOptionValue("ellipse_height")));
 		}
 
 		/* Ellipse alpha level. */
-		Ellipse.ALPHA = 0xFF;
+		Ellipse.ALPHA( 0xFF );
 		if (commands.hasOption("ellipse_alpha") == true) {
-			Ellipse.ALPHA = Integer
-					.valueOf(commands.getOptionValue("ellipse_alpha"));
+			Ellipse.ALPHA( Integer
+					.valueOf(commands.getOptionValue("ellipse_alpha")));
 		}
 
 		/* Parse hexadecimal values for the colors.. */
@@ -381,7 +381,7 @@ public class Main {
 			String[] values = commands.getOptionValue("colors").split(",");
 			for (String value : values) {
 				colors.add(new Color(
-						Integer.parseInt(value, 16) | Ellipse.ALPHA << 24,
+						Integer.parseInt(value, 16) | Ellipse.ALPHA() << 24,
 						true));
 			}
 		}
@@ -401,7 +401,7 @@ public class Main {
 
 		/* Set chromosome average size for the genetic algorithm. */
 		int gaChromosomeAverageSize = (original.getWidth()
-				* original.getHeight()) / (Ellipse.WIDTH * Ellipse.HEIGHT);
+				* original.getHeight()) / (Ellipse.WIDTH() * Ellipse.HEIGHT());
 		if (commands.hasOption("ga_chromosome_size") == true) {
 			gaPopulationSize = Integer
 					.valueOf(commands.getOptionValue("ga_chromosome_size"));

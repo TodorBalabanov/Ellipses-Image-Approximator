@@ -9,6 +9,7 @@ class HSVColorComparator implements ColorComparator {
 	private double weightGreen;
 	private double weightBlue;
 
+	@Override
 	public double distance(int a, int b) {
 		meanRed = (((a >> 16) & 0xFF) + ((b >> 16) & 0xFF)) / 2D;
 
@@ -25,5 +26,11 @@ class HSVColorComparator implements ColorComparator {
 		return (weightRed * deltaRed * deltaRed
 				+ weightGreen * deltaGreen * deltaGreen
 				+ weightBlue * deltaBlue * deltaBlue);
+	}
+
+	@Override
+	public double distance(int[] rgb, int color) {
+		// TODO Should be implemented particularly for this case.
+		return distance(rgb[0] << 16 | rgb[1] << 8 | rgb[2], color);
 	}
 }

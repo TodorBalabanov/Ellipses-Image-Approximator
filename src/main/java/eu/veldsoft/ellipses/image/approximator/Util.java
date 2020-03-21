@@ -1,6 +1,5 @@
 package eu.veldsoft.ellipses.image.approximator;
 
-import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
@@ -38,9 +37,11 @@ class Util {
 
 		int size = 0;
 		double sum = 0;
-		for (size = 0; size < aPixels.length && size < bPixels.length; size++) {
-			sum += euclidean.distance(aPixels[size] & 0xFFFFFF,
-					bPixels[size] & 0xFFFFFF);
+		int length = (aPixels.length < bPixels.length)
+				? aPixels.length
+				: bPixels.length;
+		for (size = 0; size < length; size++) {
+			sum += euclidean.distance(aPixels[size], bPixels[size]);
 		}
 
 		return sum / size;
@@ -56,7 +57,7 @@ class Util {
 				bestDistance = euclidean.distance(color.getRGB() & 0xFFFFFF,
 						bestColor.getRGB() & 0xFFFFFF);
 
-		for (int i = colors.size(); i > 0; i--) {
+		for (int i = colors.size() - 1; i > 0; i--) {
 			candidate = colors.get(i);
 			distance = euclidean.distance(color.getRGB() & 0xFFFFFF,
 					candidate.getRGB() & 0xFFFFFF);
@@ -91,8 +92,7 @@ class Util {
 			List<Ellipse> ellipses) {
 		// TODO Implement colors merge in overlapping ellipses.
 		Graphics2D graphics = (Graphics2D) image.getGraphics();
-		graphics.setStroke(new BasicStroke(Ellipse.HEIGHT,
-				BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND));
+		graphics.setStroke(Ellipse.STROKE);
 
 		for (Ellipse ellipse : ellipses) {
 			graphics.setColor(ellipse.color);
