@@ -47,19 +47,18 @@ class Util {
 		return sum / size;
 	}
 
-	static Color closestColor(Color color, Vector<Color> colors) {
+	static Color closestColor(int rgb, Vector<Color> colors) {
 		if (colors.size() <= 0) {
-			return color;
+			throw new RuntimeException("List of colors can not be emtpy!");
 		}
 
 		Color candidate, bestColor = colors.get(0);
-		double distance,
-				bestDistance = euclidean.distance(color.getRGB() & 0xFFFFFF,
-						bestColor.getRGB() & 0xFFFFFF);
+		double distance, bestDistance = euclidean.distance(rgb & 0xFFFFFF,
+				bestColor.getRGB() & 0xFFFFFF);
 
 		for (int i = colors.size() - 1; i > 0; i--) {
 			candidate = colors.get(i);
-			distance = euclidean.distance(color.getRGB() & 0xFFFFFF,
+			distance = euclidean.distance(rgb & 0xFFFFFF,
 					candidate.getRGB() & 0xFFFFFF);
 
 			if (distance < bestDistance) {
@@ -114,7 +113,7 @@ class Util {
 			y = PRNG.nextInt(image.getHeight());
 
 			if (pixelClosestColor == true) {
-				color = closestColor(new Color(image.getRGB(x, y)), colors);
+				color = closestColor(image.getRGB(x, y), colors);
 			}
 
 			double theta = 2.0D * Math.PI * PRNG.nextDouble();
@@ -135,7 +134,7 @@ class Util {
 			y = PRNG.nextInt(image.getHeight());
 
 			if (pixelClosestColor == true) {
-				color = closestColor(new Color(image.getRGB(x, y)), colors);
+				color = closestColor(image.getRGB(x, y), colors);
 			}
 
 			double theta = 2.0D * Math.PI * PRNG.nextDouble();

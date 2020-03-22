@@ -326,14 +326,24 @@ public class Main {
 		/* Read input image. */
 		original = ImageIO.read(input);
 
+		/* Parse hexadecimal values for the colors.. */
+		colors.clear();
+		if (commands.hasOption("colors") == true) {
+			String[] values = commands.getOptionValue("colors").split(",");
+			for (String value : values) {
+				colors.add(new Color(
+						Integer.parseInt(value, 16) | Ellipse.ALPHA() << 24,
+						true));
+			}
+		}
+
 		/*
 		 * Calculate the most used colors from the original picture.
 		 */
 		int pixels[] = original.getRGB(0, 0, original.getWidth(),
 				original.getHeight(), null, 0, original.getWidth());
 		for (int i = 0; i < pixels.length; i++) {
-			Color color = new Color(pixels[i]);
-			color = Util.closestColor(color, colors);
+			Color color = Util.closestColor(pixels[i], colors);
 			// TODO It is not clear that mapping to the closest color is the
 			// correct way of histogram calculation.
 
@@ -344,6 +354,7 @@ public class Main {
 						histogram.get(color.toString()) + 1);
 			}
 		}
+		Util.usage.setHistogram(histogram);
 
 		/* Associate output folder. */
 		File output = null;
@@ -355,35 +366,24 @@ public class Main {
 		String path = output.getCanonicalPath() + "/";
 
 		/* Set ellipse width. */
-		Ellipse.WIDTH( 1 );
+		Ellipse.WIDTH(1);
 		if (commands.hasOption("ellipse_width") == true) {
-			Ellipse.WIDTH( Integer
-					.valueOf(commands.getOptionValue("ellipse_width")));
+			Ellipse.WIDTH(
+					Integer.valueOf(commands.getOptionValue("ellipse_width")));
 		}
 
 		/* Set ellipse height. */
-		Ellipse.HEIGHT( 1 );
+		Ellipse.HEIGHT(1);
 		if (commands.hasOption("ellipse_height") == true) {
-			Ellipse.HEIGHT( Integer
-					.valueOf(commands.getOptionValue("ellipse_height")));
+			Ellipse.HEIGHT(
+					Integer.valueOf(commands.getOptionValue("ellipse_height")));
 		}
 
 		/* Ellipse alpha level. */
-		Ellipse.ALPHA( 0xFF );
+		Ellipse.ALPHA(0xFF);
 		if (commands.hasOption("ellipse_alpha") == true) {
-			Ellipse.ALPHA( Integer
-					.valueOf(commands.getOptionValue("ellipse_alpha")));
-		}
-
-		/* Parse hexadecimal values for the colors.. */
-		colors.clear();
-		if (commands.hasOption("colors") == true) {
-			String[] values = commands.getOptionValue("colors").split(",");
-			for (String value : values) {
-				colors.add(new Color(
-						Integer.parseInt(value, 16) | Ellipse.ALPHA() << 24,
-						true));
-			}
+			Ellipse.ALPHA(
+					Integer.valueOf(commands.getOptionValue("ellipse_alpha")));
 		}
 
 		/* Use pixels colors to estimate the most proper color of the set. */
@@ -517,7 +517,7 @@ public class Main {
 		 */
 		Util.writeSolution(original,
 				((EllipseListChromosome) initial.getFittestChromosome())
-						.getSortedEllipses(),
+						.getEllipses(),
 				path + System.currentTimeMillis() + ".png");
 		System.out.println("Optimization start ...");
 		System.out.write(
@@ -553,7 +553,7 @@ public class Main {
 		 */
 		Util.writeSolution(original,
 				((EllipseListChromosome) optimized.getFittestChromosome())
-						.getSortedEllipses(),
+						.getEllipses(),
 				path + System.currentTimeMillis() + ".png");
 		System.out.println("Optimization end ...");
 		System.out.write(

@@ -11,15 +11,15 @@ import org.apache.commons.math3.genetics.Chromosome;
 import org.apache.commons.math3.genetics.MutationPolicy;
 
 class RandomEllipsesMutation implements MutationPolicy {
-	private BufferedImage image = null;
-	private Map<String, Integer> histogram = null;
-	private Vector<Color> colors = null;
+	private static BufferedImage image = null;
+	private static Map<String, Integer> histogram = null;
+	private static Vector<Color> colors = null;
 
 	public RandomEllipsesMutation(BufferedImage image,
 			Map<String, Integer> histogram, Vector<Color> colors) {
-		this.image = image;
-		this.histogram = histogram;
-		this.colors = colors;
+		RandomEllipsesMutation.image = image;
+		RandomEllipsesMutation.histogram = histogram;
+		RandomEllipsesMutation.colors = colors;
 	}
 
 	@Override

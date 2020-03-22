@@ -19,13 +19,13 @@ class EllipseListChromosome extends AbstractListChromosome<Ellipse>
 	private static int AVERAGE_LENGTH = 0;
 
 	/** Reference to the original image. */
-	private BufferedImage image = null;
+	private static BufferedImage image = null;
 
 	/** Reference to the original image histogram. */
-	private Map<String, Integer> histogram = null;
+	private static Map<String, Integer> histogram = null;
 
 	/** Reference to the set of reduced colors. */
-	private Vector<Color> colors = null;
+	private static Vector<Color> colors = null;
 
 	/**
 	 * @return The average length of the chromosome.
@@ -46,32 +46,13 @@ class EllipseListChromosome extends AbstractListChromosome<Ellipse>
 		AVERAGE_LENGTH = averageLength;
 	}
 
-	private List<Ellipse> sort() {
-		// TODO When set of colors is also optimized the histogram should be
-		// calculated each time when colors set is changed.
-
-		/*
-		 * Sort according color usage and x-y coordinates. The most used colors
-		 * should be drawn first.
-		 */
-		Util.usage.setHistogram(histogram);
-		List<Ellipse> list = new ArrayList<Ellipse>(getRepresentation());
-
-		/*
-		 * Sorting have sense if only there is a histogram calculated.
-		 */
-		Collections.sort(list, Util.usage);
-
-		return list;
-	}
-
 	public EllipseListChromosome(Ellipse[] representation, BufferedImage image,
 			Map<String, Integer> histogram, Vector<Color> colors)
 			throws InvalidRepresentationException {
 		super(representation);
-		this.image = image;
-		this.histogram = histogram;
-		this.colors = colors;
+		EllipseListChromosome.image = image;
+		EllipseListChromosome.histogram = histogram;
+		EllipseListChromosome.colors = colors;
 
 		checkValidity(getRepresentation());
 	}
@@ -80,9 +61,9 @@ class EllipseListChromosome extends AbstractListChromosome<Ellipse>
 			BufferedImage image, Map<String, Integer> histogram,
 			Vector<Color> colors) throws InvalidRepresentationException {
 		super(representation);
-		this.image = image;
-		this.histogram = histogram;
-		this.colors = colors;
+		EllipseListChromosome.image = image;
+		EllipseListChromosome.histogram = histogram;
+		EllipseListChromosome.colors = colors;
 
 		checkValidity(getRepresentation());
 	}
@@ -91,24 +72,21 @@ class EllipseListChromosome extends AbstractListChromosome<Ellipse>
 			BufferedImage image, Map<String, Integer> histogram,
 			Vector<Color> colors) throws InvalidRepresentationException {
 		super(representation, copy);
-		this.image = image;
-		this.histogram = histogram;
-		this.colors = colors;
+		EllipseListChromosome.image = image;
+		EllipseListChromosome.histogram = histogram;
+		EllipseListChromosome.colors = colors;
 
 		checkValidity(getRepresentation());
 	}
 
 	@Override
 	public double fitness() {
-		/* Sort ellipses by color with the most used color first. */
-		List<Ellipse> list = sort();
-
 		/*
 		 * Draw ellipses.
 		 */
 		BufferedImage experimental = new BufferedImage(image.getWidth(),
 				image.getHeight(), BufferedImage.TYPE_INT_ARGB);
-		Util.drawEllipses(experimental, list);
+		Util.drawEllipses(experimental, getRepresentation());
 
 		/* Multiple-criteria for fitness value estimation. */
 		// double size = list.size();
@@ -116,7 +94,7 @@ class EllipseListChromosome extends AbstractListChromosome<Ellipse>
 		// double alpha = Util.alphaLevel(experimental, colors);
 
 		// return 1D / size;
-		return 1D / distance;
+		return -distance;
 		// return 1D / alpha;
 		// return 1D / size + 1D / distance + 1D / alpha;
 
@@ -134,7 +112,7 @@ class EllipseListChromosome extends AbstractListChromosome<Ellipse>
 		if (image == null) {
 			return;
 		}
-
+		
 		/* Put all coordinates inside image dimensions. */
 		for (Ellipse ellipse : list) {
 			if (ellipse.x1 < 0 || ellipse.x2 < 0) {
@@ -179,10 +157,6 @@ class EllipseListChromosome extends AbstractListChromosome<Ellipse>
 		return getRepresentation();
 	}
 
-	public List<Ellipse> getSortedEllipses() {
-		return sort();
-	}
-
 	public Ellipse getRandomElement() {
 		return getRepresentation()
 				.get(Util.PRNG.nextInt(getRepresentation().size()));
@@ -193,7 +167,8 @@ class EllipseListChromosome extends AbstractListChromosome<Ellipse>
 		String gCode = "";
 
 		/* Sorting by colors is important for the plotting order. */
-		List<Ellipse> list = sort();
+		List<Ellipse> list = new ArrayList<Ellipse>(getEllipses());
+		Collections.sort(list, Util.usage);
 		if (list.size() == 0) {
 			return gCode;
 		}
