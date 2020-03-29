@@ -185,22 +185,19 @@ class EllipseListChromosome extends AbstractListChromosome<Ellipse>
 		gCode += "(G Code instructions for "
 				+ color.toString().replace("java.awt.Color", "") + " color.)";
 		gCode += "\n";
-		gCode += "G21 (All units are in millimeters.)";
-		gCode += "\n";
 		gCode += "G90 (Switch to absolute coordinates.)";
 		gCode += "\n";
-		gCode += "G00 Z15.00 (Fast pen move up for initialization.)";
+		gCode += "G21 (All units are in millimeters.)";
 		gCode += "\n";
-		gCode += "G00 X0.00 Y0.00 (Fast move to home position for initialization.)";
+		gCode += "M3S" + configuration.zUp + " (Move up for initialization.)";
+		gCode += "\n";
+		gCode += "X" + configuration.xHome + " Y" + configuration.yHome
+				+ " (Move to home position for initialization.)";
 		gCode += "\n";
 
 		/* Drawing instructions. */
 		for (Ellipse ellipse : list) {
 			if (color.equals(ellipse.color) == false) {
-				gCode += "\n";
-				gCode += "G04 P" + configuration.colorChangeTime
-						+ " (Wait for setup of the next color.)";
-				gCode += "\n";
 				gCode += "\n";
 
 				/*
@@ -213,13 +210,14 @@ class EllipseListChromosome extends AbstractListChromosome<Ellipse>
 						+ color.toString().replace("java.awt.Color", "")
 						+ " color.)";
 				gCode += "\n";
-				gCode += "G21 (All units are in millimeters.)";
-				gCode += "\n";
 				gCode += "G90 (Switch to absolute coordinates.)";
 				gCode += "\n";
-				gCode += "G00 Z15.00 (Fast pen move up for initialization.)";
+				gCode += "G21 (All units are in millimeters.)";
 				gCode += "\n";
-				gCode += "G00 X0.00 Y0.00 (Fast move to home position for initialization.)";
+				gCode += "M3S" + configuration.zUp
+						+ " (Move up for initialization.)";
+				gCode += "\n";
+				gCode += "X0 Y0 (Move to home position for initialization.)";
 				gCode += "\n";
 			}
 
@@ -231,13 +229,7 @@ class EllipseListChromosome extends AbstractListChromosome<Ellipse>
 			gCode += "\n";
 		}
 
-		gCode += "\n";
-		gCode += "G04 P" + configuration.colorChangeTime
-				+ " (Wait for setup of the next color.)";
-
-		gCode = gCode.trim();
-
-		return gCode;
+		return gCode.trim();
 	}
 
 }

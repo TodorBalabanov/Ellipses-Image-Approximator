@@ -10,6 +10,10 @@ interface GCode {
 	 * Transformation parameters.
 	 */
 	class Settings {
+		/** X home of the plotter working area. */
+		double xHome;
+		/** Y home of the plotter working area. */
+		double yHome;
 		/** X offset of the plotter working area. */
 		double xOffset;
 		/** Y offset of the plotter working area. */
@@ -22,12 +26,18 @@ interface GCode {
 		double scale;
 		/** Paint refill time in seconds. */
 		double penRefillTime;
+		/** Paint refill number of times. */
+		int penRefillCount;
 		/** Color change time in seconds. */
 		double colorChangeTime;
 
 		/**
 		 * Constructor for setup of the all fields.
 		 * 
+		 * @param xHome
+		 *            X home of the plotter working area.
+		 * @param yHome
+		 *            Y home of the plotter working area.
 		 * @param xOffset
 		 *            X offset of the plotter working area.
 		 * @param yOffset
@@ -41,19 +51,25 @@ interface GCode {
 		 *            milliliters.
 		 * @param penRefillTime
 		 *            Paint refill time in seconds.
+		 * @param penRefillCount
+		 *            Paint refill amount of times.
 		 * @param colorChangeTime
 		 *            Color change time in seconds.
 		 */
-		public Settings(double xOffset, double yOffset, double zDown,
-				double zUp, double scale, double penRefillTime,
+		public Settings(double xHome, double yHome, double xOffset,
+				double yOffset, double zDown, double zUp, double scale,
+				double penRefillTime, int penRefillCount,
 				double colorChangeTime) {
 			super();
+			this.xHome = xHome;
+			this.yHome = yHome;
 			this.xOffset = xOffset;
 			this.yOffset = yOffset;
 			this.zDown = zDown;
 			this.zUp = zUp;
 			this.scale = scale;
 			this.penRefillTime = penRefillTime;
+			this.penRefillCount = penRefillCount;
 			this.colorChangeTime = colorChangeTime;
 		}
 	}

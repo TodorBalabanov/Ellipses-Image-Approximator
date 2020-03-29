@@ -100,29 +100,41 @@ class Ellipse implements Cloneable, GCode {
 
 	@Override
 	public String toGCode(Settings configuration) {
-		String gCode = "G00 Z" + configuration.zUp + " (Fast pen move up.)"
-				+ "\n" + "G00 X0.00 Y0.00 (Fast move to home position.)" + "\n"
-				+ "G00 Z" + configuration.zDown + " (Fast pen move down.)"
-				+ "\n" + "G04 P" + configuration.penRefillTime
-				+ " (Wait for paint refill before proceeding.)" + "\n" + "G00 Z"
-				+ configuration.zUp + " (Fast pen move up.)" + "\n" + "G00 X"
+		String refill = "";
+
+		for (int i = 0; i < configuration.penRefillCount; i++) {
+			refill += "M3S" + configuration.zDown + " (Pen move down.)" + "\n";
+			refill += "M3S" + configuration.zUp + " (Pen move up.)" + "\n";
+		}
+
+		String gCode = "M3S" + configuration.zUp + " (Pen move up.)" + "\n"
+
+				+ "X" + configuration.xHome + " Y" + configuration.yHome
+				+ " (Move to home position.)" + "\n"
+
+				+ refill
+
+				+ "X"
 				+ Precision.round(
 						configuration.xOffset + x1 * configuration.scale, 2)
 				+ " Y"
 				+ Precision.round(
 						configuration.yOffset + y1 * configuration.scale, 2)
-				+ " (Fast move to first point position.)" + "\n" + "G01 Z"
-				+ configuration.zDown + " (Slow pen move down.)" + "\n"
-				+ "G01 X"
+				+ " (Move to first point position.)" + "\n"
+
+				+ "M3S" + configuration.zDown + " (Pen move down.)" + "\n"
+
+				+ "X"
 				+ Precision.round(
 						configuration.xOffset + x2 * configuration.scale, 2)
 				+ " Y"
 				+ Precision.round(
-						configuration.yOffset + y1 * configuration.scale, 2)
-				+ " (Slow move to second point position.)" + "\n" + "G01 Z"
-				+ configuration.zUp + " (Slow pen move up.)";
+						configuration.yOffset + y2 * configuration.scale, 2)
+				+ " (Move to second point position.)" + "\n"
 
-		return gCode;
+				+ "M3S" + configuration.zUp + " (Pen move up.)" + "\n";
+
+		return gCode.trim();
 	}
 
 	@Override

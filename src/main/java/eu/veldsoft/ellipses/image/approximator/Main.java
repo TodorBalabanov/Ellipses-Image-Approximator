@@ -193,6 +193,14 @@ public class Main {
 				.desc("Set of colors as comma separeated list of RGB hexadecimal numbers.")
 				.build());
 
+		options.addOption(Option.builder("g_code_x_home").argName("number")
+				.hasArg().valueSeparator()
+				.desc("X home of the drawing area (default value 0).").build());
+
+		options.addOption(Option.builder("g_code_y_home").argName("number")
+				.hasArg().valueSeparator()
+				.desc("Y home of the drawing area (default value 0).").build());
+
 		options.addOption(Option.builder("g_code_x_offset").argName("number")
 				.hasArg().valueSeparator()
 				.desc("X offset of the drawing area (default value 0).")
@@ -220,6 +228,10 @@ public class Main {
 				.hasArg().valueSeparator()
 				.desc("Paint refill time in seconds (default value 0.0).")
 				.build());
+
+		options.addOption(Option.builder("g_code_refill_count")
+				.argName("number").hasArg().valueSeparator()
+				.desc("Paint refill count (default value 1).").build());
 
 		options.addOption(Option.builder("g_code_color_change")
 				.argName("number").hasArg().valueSeparator()
@@ -463,17 +475,30 @@ public class Main {
 					.valueOf(commands.getOptionValue("aco_iterations"));
 		}
 
-		Settings settings = new GCode.Settings(0, 0, 0, 0, 0.0, 0.0, 0);
+		Settings settings = new GCode.Settings(0, 0, 0, 0, 0, 0, 0.0, 0.0, 1,
+				0);
+
+		/* Painting home by X axis. */
+		if (commands.hasOption("g_code_x_home") == true) {
+			settings.xHome = Double
+					.valueOf(commands.getOptionValue("g_code_x_home"));
+		}
+
+		/* Painting home by Y axis. */
+		if (commands.hasOption("g_code_y_home") == true) {
+			settings.yHome = Double
+					.valueOf(commands.getOptionValue("g_code_y_home"));
+		}
 
 		/* Painting offset by X axis. */
 		if (commands.hasOption("g_code_x_offset") == true) {
-			settings.xOffset = Integer
+			settings.xOffset = Double
 					.valueOf(commands.getOptionValue("g_code_x_offset"));
 		}
 
 		/* Painting offset by Y axis. */
 		if (commands.hasOption("g_code_y_offset") == true) {
-			settings.yOffset = Integer
+			settings.yOffset = Double
 					.valueOf(commands.getOptionValue("g_code_y_offset"));
 		}
 
@@ -499,6 +524,12 @@ public class Main {
 		if (commands.hasOption("g_code_refill") == true) {
 			settings.penRefillTime = Double
 					.valueOf(commands.getOptionValue("g_code_refill"));
+		}
+
+		/* Paint refill amount of times. */
+		if (commands.hasOption("g_code_refill_count") == true) {
+			settings.penRefillCount = Integer
+					.valueOf(commands.getOptionValue("g_code_refill_count"));
 		}
 
 		/* Color change time in seconds. */
@@ -543,8 +574,9 @@ public class Main {
 			BufferedOutputStream out = new BufferedOutputStream(
 					new FileOutputStream(
 							path + System.currentTimeMillis() + ".cnc"));
-			out.write(((EllipseListChromosome) optimized.getFittestChromosome())
-					.toGCode(settings).getBytes());
+			out.write(
+					(((EllipseListChromosome) optimized.getFittestChromosome())
+							.toGCode(settings) + "\n").getBytes());
 			out.close();
 		}
 
