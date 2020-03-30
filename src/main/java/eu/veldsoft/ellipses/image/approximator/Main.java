@@ -412,8 +412,9 @@ public class Main {
 		}
 
 		/* Set chromosome average size for the genetic algorithm. */
-		int gaChromosomeAverageSize = (original.getWidth()
-				* original.getHeight()) / (Ellipse.WIDTH() * Ellipse.HEIGHT());
+		int gaChromosomeAverageSize = (int) Math
+				.floor((original.getWidth() * original.getHeight())
+						/ (Math.PI * Ellipse.WIDTH() * Ellipse.HEIGHT() / 4D));
 		if (commands.hasOption("ga_chromosome_size") == true) {
 			gaChromosomeAverageSize = Integer
 					.valueOf(commands.getOptionValue("ga_chromosome_size"));

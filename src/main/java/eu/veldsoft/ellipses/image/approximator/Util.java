@@ -155,7 +155,7 @@ class Util {
 							EllipseListChromosome.AVERAGE_LENGTH()),
 					image, histogram, colors));
 		}
-		return new ElitisticListPopulation(list, 2 * list.size(), elitismRate);
+		return new ElitisticListPopulation(list, list.size(), elitismRate);
 	}
 
 	static void writeSolution(BufferedImage image, List<Ellipse> list,

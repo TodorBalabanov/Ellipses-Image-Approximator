@@ -79,8 +79,16 @@ class EllipseListChromosome extends AbstractListChromosome<Ellipse>
 		checkValidity(getRepresentation());
 	}
 
+	/**
+	 * The most fitted chromosome has a minimum value.
+	 * 
+	 * @return Chromosome fitness value.
+	 */
 	@Override
 	public double fitness() {
+		// TODO Better handling of multiple criteria should be implemented. At
+		// least coefficients should be parameterized from outside.
+
 		/*
 		 * Draw ellipses.
 		 */
@@ -89,17 +97,25 @@ class EllipseListChromosome extends AbstractListChromosome<Ellipse>
 		Util.drawEllipses(experimental, getRepresentation());
 
 		/* Multiple-criteria for fitness value estimation. */
-		// double size = getRepresentation().size();
+		double disproportion = Math.abs((getRepresentation().size()
+				* Math.PI * Ellipse.WIDTH() * Ellipse.HEIGHT() / 4D)
+				- (image.getWidth() * image.getHeight()));
 		double distance = Util.distance(image, experimental);
-		// double alpha = Util.alphaLevel(experimental, colors);
+		double alpha = 1 + Util.alphaLevel(experimental, colors);
 
-		// return 1D / size;
-		return -distance;
-		// return 1D / alpha;
-		// return -distance * 1D / size * 1D / alpha;
-
-		// TODO Better handling of multiple criteria should be implemented. At
-		// least coefficients should be parameterized from outside.
+		/*
+		 * All criteria taken separately should go to a minimum value as
+		 * possible. Apache Commons Genetic Algorithms framework is organized in
+		 * such a way that if single criteria should go down they should be
+		 * taken with negative signs. Like this:
+		 * 
+		 * return -disproportion;
+		 * 
+		 * return -distance;
+		 * 
+		 * return -alpha;
+		 */
+		return -(alpha * distance * disproportion);
 	}
 
 	@Override
