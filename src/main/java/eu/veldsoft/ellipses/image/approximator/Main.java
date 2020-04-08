@@ -547,9 +547,9 @@ public class Main {
 		/*
 		 * Report initial best solution.
 		 */
-		Util.writeSolution(original,
-				((EllipseListChromosome) initial.getFittestChromosome())
-						.getEllipses(),
+		Util.writeSolution(original.getWidth(), original.getHeight(),
+				((EllipseListChromosome) optimized.getFittestChromosome())
+						.getEllipses(), optimized.getFittestChromosome().getFitness(),
 				path + System.currentTimeMillis() + ".png");
 		System.out.println("Optimization start ...");
 		System.out.write(
@@ -584,9 +584,9 @@ public class Main {
 		/*
 		 * Report best found solution.
 		 */
-		Util.writeSolution(original,
+		Util.writeSolution(original.getWidth(), original.getHeight(),
 				((EllipseListChromosome) optimized.getFittestChromosome())
-						.getEllipses(),
+						.getEllipses(), optimized.getFittestChromosome().getFitness(),
 				path + System.currentTimeMillis() + ".png");
 		System.out.println("Optimization end ...");
 		System.out.write(

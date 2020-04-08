@@ -3,6 +3,7 @@ package eu.veldsoft.ellipses.image.approximator;
 import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -12,7 +13,15 @@ import java.util.Map;
 import java.util.Random;
 import java.util.Vector;
 
+import javax.imageio.IIOImage;
 import javax.imageio.ImageIO;
+import javax.imageio.ImageTypeSpecifier;
+import javax.imageio.ImageWriteParam;
+import javax.imageio.ImageWriter;
+import javax.imageio.metadata.IIOInvalidTreeException;
+import javax.imageio.metadata.IIOMetadata;
+import javax.imageio.metadata.IIOMetadataNode;
+import javax.imageio.stream.ImageOutputStream;
 
 import org.apache.commons.math3.genetics.Chromosome;
 import org.apache.commons.math3.genetics.ElitisticListPopulation;
@@ -158,12 +167,51 @@ class Util {
 		return new ElitisticListPopulation(list, list.size(), elitismRate);
 	}
 
-	static void writeSolution(BufferedImage image, List<Ellipse> list,
-			String file) {
+	static void writeSolution(int width, int height, List<Ellipse> list,
+			double fitness, String file) {
+		IIOMetadataNode sizeTextEntry = new IIOMetadataNode("tEXtEntry");
+		sizeTextEntry.setAttribute("keyword", "size");
+		sizeTextEntry.setAttribute("value", "" + list.size());
+
+		IIOMetadataNode fitnessTextEntry = new IIOMetadataNode("tEXtEntry");
+		fitnessTextEntry.setAttribute("keyword", "fitness");
+		fitnessTextEntry.setAttribute("value", "" + fitness);
+
+		IIOMetadataNode sizeText = new IIOMetadataNode("tEXt");
+		sizeText.appendChild(sizeTextEntry);
+
+		IIOMetadataNode fitnessText = new IIOMetadataNode("tEXt");
+		fitnessText.appendChild(fitnessTextEntry);
+
+		IIOMetadataNode root = new IIOMetadataNode("javax_imageio_png_1.0");
+		root.appendChild(sizeText);
+		root.appendChild(fitnessText);
+
+		ImageWriter writer = ImageIO.getImageWritersByFormatName("png").next();
+
+		IIOMetadata metadata = writer.getDefaultImageMetadata(
+				ImageTypeSpecifier.createFromBufferedImageType(
+						BufferedImage.TYPE_INT_ARGB),
+				writer.getDefaultWriteParam());
+
 		try {
-			ImageIO.write(Util.drawEllipses(new BufferedImage(image.getWidth(),
-					image.getHeight(), BufferedImage.TYPE_INT_ARGB), list),
-					"png", new File(file));
+			metadata.mergeTree("javax_imageio_png_1.0", root);
+		} catch (IIOInvalidTreeException e) {
+			e.printStackTrace();
+		}
+
+		BufferedImage image = Util.drawEllipses(
+				new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB),
+				list);
+
+		try {
+			writer.setOutput(ImageIO
+					.createImageOutputStream(new ByteArrayOutputStream()));
+
+			writer.write(metadata, new IIOImage(image, null, metadata),
+					writer.getDefaultWriteParam());
+
+			ImageIO.write(image, "png", new File(file));
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
