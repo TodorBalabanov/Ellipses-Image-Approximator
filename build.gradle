@@ -7,6 +7,7 @@ repositories {
 }
 
 dependencies {
+	compile group: 'ar.com.hjg', name: 'pngj', version: '2.1.0'
     compile 'org.apache.commons:commons-math3:3.6.1'
     compile 'commons-cli:commons-cli:1.4'
     testImplementation 'junit:junit:4.12'

@@ -97,8 +97,8 @@ class EllipseListChromosome extends AbstractListChromosome<Ellipse>
 		Util.drawEllipses(experimental, getRepresentation());
 
 		/* Multiple-criteria for fitness value estimation. */
-		double disproportion = Math.abs((getRepresentation().size()
-				* Math.PI * Ellipse.WIDTH() * Ellipse.HEIGHT() / 4D)
+		double disproportion = Math.abs((getRepresentation().size() * Math.PI
+				* Ellipse.WIDTH() * Ellipse.HEIGHT() / 4D)
 				- (image.getWidth() * image.getHeight()));
 		double distance = Util.distance(image, experimental);
 		double alpha = 1 + Util.alphaLevel(experimental, colors);
