@@ -22,7 +22,7 @@ import java.io.Serializable;
 
 public class AntGraph implements Serializable {
 	private static final long serialVersionUID = 0L;
-	
+
 	private double[][] m_delta;
 	private double[][] m_tau;
 	private int m_nNodes;

@@ -13,6 +13,7 @@ class Ellipse implements Cloneable, GCode {
 
 	static BasicStroke STROKE = null;
 
+	double theta;
 	int x1;
 	int y1;
 	int x2;
@@ -72,6 +73,7 @@ class Ellipse implements Cloneable, GCode {
 	}
 
 	void setup(int x, int y, double theta) {
+		this.theta = theta;
 		x1 = (int) (WIDTH * Math.cos(theta + Math.PI) / 2.0D + x);
 		y1 = (int) (WIDTH * Math.sin(theta + Math.PI) / 2.0D + y);
 		x2 = (int) (WIDTH * Math.cos(theta) / 2.0D + x);
@@ -90,6 +92,7 @@ class Ellipse implements Cloneable, GCode {
 	}
 
 	public Ellipse(Ellipse ellipse) {
+		theta = ellipse.theta;
 		x1 = ellipse.x1;
 		y1 = ellipse.y1;
 		x2 = ellipse.x2;

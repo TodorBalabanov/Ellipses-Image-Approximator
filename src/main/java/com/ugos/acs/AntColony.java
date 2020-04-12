@@ -52,9 +52,9 @@ public abstract class AntColony implements Observer {
 
 		m_nIterCounter = 0;
 		try {
-			m_outs = new PrintStream(new FileOutputStream("" + m_nID + "_"
-					+ m_graph.nodes() + "x" + m_ants.length + "x"
-					+ m_nIterations + "_colony.txt"));
+			m_outs = new PrintStream(new FileOutputStream(
+					"" + m_nID + "_" + m_graph.nodes() + "x" + m_ants.length
+							+ "x" + m_nIterations + "_colony.txt"));
 		} catch (Exception ex) {
 			ex.printStackTrace();
 		}
@@ -115,8 +115,8 @@ public abstract class AntColony implements Observer {
 		m_nAntCounter++;
 
 		if (m_nAntCounter == m_ants.length) {
-			m_outs.println(";" + Ant.s_dBestPathValue + ";"
-					+ m_graph.averageTau());
+			m_outs.println(
+					";" + Ant.s_dBestPathValue + ";" + m_graph.averageTau());
 
 			// System.out.println("---------------------------");
 			// System.out.println(m_iterCounter + " - Best Path: " +

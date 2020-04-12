@@ -1,12 +1,19 @@
 apply plugin: 'java'
 apply plugin: 'eclipse'
 
+java {
+    sourceCompatibility = JavaVersion.VERSION_1_8
+    targetCompatibility = JavaVersion.VERSION_1_8
+}
+
 repositories {
     jcenter()
     mavenCentral()
 }
 
 dependencies {
+	compile group: 'org.apache.xmlgraphics', name: 'batik-svggen', version: '1.12'
+	compile group: 'org.apache.xmlgraphics', name: 'batik-dom', version: '1.12'
 	compile group: 'ar.com.hjg', name: 'pngj', version: '2.1.0'
     compile 'org.apache.commons:commons-math3:3.6.1'
     compile 'commons-cli:commons-cli:1.4'

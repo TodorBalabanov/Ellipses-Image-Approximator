@@ -66,11 +66,11 @@ public abstract class Ant extends Observable implements Runnable {
 	public void init() {
 		if (s_outs == null) {
 			try {
-				s_outs = new PrintStream(new FileOutputStream(""
-						+ s_antColony.getID() + "_"
-						+ s_antColony.getGraph().nodes() + "x"
-						+ s_antColony.getAnts() + "x"
-						+ s_antColony.getIterations() + "_ants.txt"));
+				s_outs = new PrintStream(
+						new FileOutputStream("" + s_antColony.getID() + "_"
+								+ s_antColony.getGraph().nodes() + "x"
+								+ s_antColony.getAnts() + "x"
+								+ s_antColony.getIterations() + "_ants.txt"));
 			} catch (Exception ex) {
 				ex.printStackTrace();
 			}

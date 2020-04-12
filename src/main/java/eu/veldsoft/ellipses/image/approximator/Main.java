@@ -551,7 +551,7 @@ public class Main {
 				((EllipseListChromosome) optimized.getFittestChromosome())
 						.getEllipses(),
 				optimized.getFittestChromosome().getFitness(),
-				path + System.currentTimeMillis() + ".png");
+				path + System.currentTimeMillis() + ".svg");
 		System.out.println("Optimization start ...");
 		System.out.write(
 				("Fitness: " + initial.getFittestChromosome().getFitness()
@@ -573,13 +573,46 @@ public class Main {
 		 * Print plotting instructions.
 		 */
 		if (gCodeOutput == true) {
+			String gcode = ((EllipseListChromosome) optimized
+					.getFittestChromosome()).toGCode(settings);
+
+			long time = System.currentTimeMillis();
 			BufferedOutputStream out = new BufferedOutputStream(
-					new FileOutputStream(
-							path + System.currentTimeMillis() + ".cnc"));
-			out.write(
-					(((EllipseListChromosome) optimized.getFittestChromosome())
-							.toGCode(settings) + "\n").getBytes());
+					new FileOutputStream(path + time + ".cnc"));
+			out.write((gcode + "\n").getBytes());
 			out.close();
+
+			int index = -1;
+			int counter = 1;
+			while ((index = gcode.indexOf("(G Code instructions for ")) != -1) {
+				gcode = gcode.substring(index);
+				int next = gcode.substring(1)
+						.indexOf("(G Code instructions for ");
+
+				String instructions = "";
+				if (next == -1) {
+					instructions = gcode;
+				} else {
+					instructions = gcode.substring(0, next);
+				}
+
+				String color = gcode.substring(gcode.indexOf(" color.)") - 6,
+						gcode.indexOf(" color.)"));
+
+				out = new BufferedOutputStream(new FileOutputStream(
+						path + time + "-" + String.format("%03d", counter) + "-"
+								+ color + ".cnc"));
+				out.write((instructions + "\n").getBytes());
+				out.close();
+
+				if (next == -1) {
+					gcode = "";
+				} else {
+					gcode = gcode.substring(next);
+				}
+
+				counter++;
+			}
 		}
 
 		/*

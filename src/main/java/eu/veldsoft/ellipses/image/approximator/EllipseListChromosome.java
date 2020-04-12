@@ -199,7 +199,7 @@ class EllipseListChromosome extends AbstractListChromosome<Ellipse>
 		/* Initialization of G Code script. */
 		Color color = list.get(0).color;
 		gCode += "(G Code instructions for "
-				+ color.toString().replace("java.awt.Color", "") + " color.)";
+				+ String.format("%06X", color.getRGB() & 0xFFFFFF) + " color.)";
 		gCode += "\n";
 		gCode += "G90 (Switch to absolute coordinates.)";
 		gCode += "\n";
@@ -223,7 +223,7 @@ class EllipseListChromosome extends AbstractListChromosome<Ellipse>
 				color = ellipse.color;
 
 				gCode += "(G Code instructions for "
-						+ color.toString().replace("java.awt.Color", "")
+						+ String.format("%06X", color.getRGB() & 0xFFFFFF)
 						+ " color.)";
 				gCode += "\n";
 				gCode += "G90 (Switch to absolute coordinates.)";
