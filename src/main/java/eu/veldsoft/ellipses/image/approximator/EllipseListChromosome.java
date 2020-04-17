@@ -216,6 +216,11 @@ class EllipseListChromosome extends AbstractListChromosome<Ellipse>
 			if (color.equals(ellipse.color) == false) {
 				gCode += "\n";
 
+				gCode += "G04 P" + configuration.colorChangeTime
+						+ " (Color change timeout.)";
+				gCode += "\n";
+				gCode += "\n";
+
 				/*
 				 * Each change of the color should be handled in separate G Code
 				 * region.

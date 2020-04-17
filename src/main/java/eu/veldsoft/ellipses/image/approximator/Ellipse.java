@@ -117,6 +117,9 @@ class Ellipse implements Cloneable, GCode {
 
 				+ refill
 
+				+ "G04 P" + configuration.penRefillTime
+				+ " (Paint refill timeout.)\n"
+
 				+ "X"
 				+ Precision.round(
 						configuration.xOffset + x1 * configuration.scale, 2)

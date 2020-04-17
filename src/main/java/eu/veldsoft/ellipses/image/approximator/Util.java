@@ -6,8 +6,6 @@ import java.awt.Graphics2D;
 import java.awt.Shape;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Ellipse2D;
-import java.awt.geom.Ellipse2D.Double;
-import java.awt.geom.Line2D;
 import java.awt.image.BufferedImage;
 import java.io.BufferedWriter;
 import java.io.ByteArrayInputStream;
