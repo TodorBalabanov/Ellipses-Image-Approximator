@@ -193,6 +193,9 @@ public class Main {
 				.desc("Set of colors as comma separeated list of RGB hexadecimal numbers.")
 				.build());
 
+		options.addOption(new Option("g_code_comments", false,
+				"Switch on comments in G Code file (off by default)."));
+
 		options.addOption(Option.builder("g_code_x_home").argName("number")
 				.hasArg().valueSeparator()
 				.desc("X home of the drawing area (default value 0).").build());
@@ -476,8 +479,13 @@ public class Main {
 					.valueOf(commands.getOptionValue("aco_iterations"));
 		}
 
-		Settings settings = new GCode.Settings(0, 0, 0, 0, 0, 0, 0.0, 0.0, 1,
-				0);
+		Settings settings = new GCode.Settings(false, 0, 0, 0, 0, 0, 0, 0.0,
+				0.0, 1, 0);
+
+		/* G Code comments switch on. */
+		if (commands.hasOption("g_code_comments") == true) {
+			settings.comments = true;
+		}
 
 		/* Painting home by X axis. */
 		if (commands.hasOption("g_code_x_home") == true) {

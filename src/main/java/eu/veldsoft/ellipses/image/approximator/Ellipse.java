@@ -106,39 +106,77 @@ class Ellipse implements Cloneable, GCode {
 		String refill = "";
 
 		for (int i = 0; i < configuration.penRefillCount; i++) {
-			refill += "M3S" + configuration.zDown + " (Pen move down.)" + "\n";
-			refill += "M3S" + configuration.zUp + " (Pen move up.)" + "\n";
+			refill += "M3S" + configuration.zDown;
+			refill += (configuration.comments == true)
+					? " (Pen move down.)"
+					: "";
+			refill += "\r\n";
+			refill += "M3S" + configuration.zUp;
+			refill += (configuration.comments == true) ? " (Pen move up.)" : "";
+			refill += "\r\n";
 		}
 
-		String gCode = "M3S" + configuration.zUp + " (Pen move up.)" + "\n"
+		String gCode = "";
 
-				+ "X" + configuration.xHome + " Y" + configuration.yHome
-				+ " (Move to home position.)" + "\n"
+		gCode += "G00X" + configuration.xHome + "Y" + configuration.yHome;
 
-				+ refill
+		gCode += (configuration.comments == true)
+				? " (Move to home position.)"
+				: "";
 
-				+ "G04 P" + configuration.penRefillTime
-				+ " (Paint refill timeout.)\n"
+		gCode += (configuration.comments == true) ? "\r\n" : " ";
 
-				+ "X"
+		gCode += "M3S" + configuration.zUp;
+
+		gCode += (configuration.comments == true) ? " (Pen move up.)" : "";
+
+		gCode += "\r\n";
+
+		gCode += refill;
+
+		gCode += "G04P" + configuration.penRefillTime;
+
+		gCode += (configuration.comments == true)
+				? " (Paint refill timeout.)"
+				: "";
+
+		gCode += "\r\n";
+
+		gCode += "G00X"
 				+ Precision.round(
 						configuration.xOffset + x1 * configuration.scale, 2)
-				+ " Y"
-				+ Precision.round(
-						configuration.yOffset + y1 * configuration.scale, 2)
-				+ " (Move to first point position.)" + "\n"
+				+ "Y" + Precision.round(
+						configuration.yOffset + y1 * configuration.scale, 2);
 
-				+ "M3S" + configuration.zDown + " (Pen move down.)" + "\n"
+		gCode += (configuration.comments == true)
+				? " (Move to first point position.)"
+				: "";
 
-				+ "X"
+		gCode += "\r\n";
+
+		gCode += "M3S" + configuration.zDown;
+
+		gCode += (configuration.comments == true) ? " (Pen move down.)" : "";
+
+		gCode += "\r\n";
+
+		gCode += "G00X"
 				+ Precision.round(
 						configuration.xOffset + x2 * configuration.scale, 2)
-				+ " Y"
-				+ Precision.round(
-						configuration.yOffset + y2 * configuration.scale, 2)
-				+ " (Move to second point position.)" + "\n"
+				+ "Y" + Precision.round(
+						configuration.yOffset + y2 * configuration.scale, 2);
 
-				+ "M3S" + configuration.zUp + " (Pen move up.)" + "\n";
+		gCode += (configuration.comments == true)
+				? " (Move to second point position.)"
+				: "";
+
+		gCode += "\r\n";
+
+		gCode += "M3S" + configuration.zUp;
+
+		gCode += (configuration.comments == true) ? " (Pen move up.)" : "";
+
+		gCode += "\r\n";
 
 		return gCode.trim();
 	}

@@ -10,6 +10,8 @@ interface GCode {
 	 * Transformation parameters.
 	 */
 	class Settings {
+		/** Comments switch on/off flag. */
+		boolean comments;
 		/** X home of the plotter working area. */
 		double xHome;
 		/** Y home of the plotter working area. */
@@ -34,6 +36,8 @@ interface GCode {
 		/**
 		 * Constructor for setup of the all fields.
 		 * 
+		 * @param comments
+		 *            Comments switch on/off flag.
 		 * @param xHome
 		 *            X home of the plotter working area.
 		 * @param yHome
@@ -56,11 +60,12 @@ interface GCode {
 		 * @param colorChangeTime
 		 *            Color change time in seconds.
 		 */
-		public Settings(double xHome, double yHome, double xOffset,
-				double yOffset, double zDown, double zUp, double scale,
-				double penRefillTime, int penRefillCount,
+		public Settings(boolean comments, double xHome, double yHome,
+				double xOffset, double yOffset, double zDown, double zUp,
+				double scale, double penRefillTime, int penRefillCount,
 				double colorChangeTime) {
 			super();
+			this.comments = comments;
 			this.xHome = xHome;
 			this.yHome = yHome;
 			this.xOffset = xOffset;
