@@ -178,6 +178,51 @@ class EllipseListChromosome extends AbstractListChromosome<Ellipse>
 				.get(Util.PRNG.nextInt(getRepresentation().size()));
 	}
 
+	private String gCodeColorStart(Color color, Settings configuration) {
+		String gCode = "";
+
+		if (configuration.comments == true) {
+			gCode += "(G Code instructions for "
+					+ String.format("%06X", color.getRGB() & 0xFFFFFF)
+					+ " color.)";
+			gCode += "\r\n";
+		}
+
+		gCode += "G90";
+		gCode += (configuration.comments == true)
+				? " (Switch to absolute coordinates.)"
+				: "";
+		gCode += (configuration.comments == true) ? "\r\n" : "";
+		gCode += "G21";
+		gCode += (configuration.comments == true)
+				? " (All units are in millimeters.)"
+				: "";
+		gCode += (configuration.comments == true) ? "\r\n" : " ";
+		gCode += "M3S" + configuration.zDown;
+		gCode += (configuration.comments == true)
+				? " (Move down for initialization.)"
+				: "";
+		gCode += "\r\n";
+		gCode += "G04P1.0";
+		gCode += (configuration.comments == true) ? " (Pause.)" : "";
+		gCode += "\r\n";
+		gCode += "M5";
+		gCode += (configuration.comments == true) ? " (Pen move up.)" : "";
+		gCode += "\r\n";
+		gCode += "G00X" + configuration.xHome + "Y" + configuration.yHome;
+		gCode += (configuration.comments == true)
+				? " (Move to home position for initialization.)"
+				: "";
+		gCode += "\r\n";
+		gCode += "G04P1.0";
+		gCode += (configuration.comments == true)
+				? " (Initialization timeout.)"
+				: "";
+		gCode += "\r\n";
+
+		return gCode;
+	}
+
 	@Override
 	public String toGCode(Settings configuration) {
 		String gCode = "";
@@ -201,33 +246,7 @@ class EllipseListChromosome extends AbstractListChromosome<Ellipse>
 		/* Initialization of G Code script. */
 		Color color = list.get(0).color;
 
-		if (configuration.comments == true) {
-			gCode += "(G Code instructions for "
-					+ String.format("%06X", color.getRGB() & 0xFFFFFF)
-					+ " color.)";
-			gCode += "\r\n";
-		}
-
-		gCode += "G90";
-		gCode += (configuration.comments == true)
-				? " (Switch to absolute coordinates.)"
-				: "";
-		gCode += (configuration.comments == true) ? "\r\n" : "";
-		gCode += "G21";
-		gCode += (configuration.comments == true)
-				? " (All units are in millimeters.)"
-				: "";
-		gCode += (configuration.comments == true) ? "\r\n" : " ";
-		gCode += "M3S" + configuration.zUp;
-		gCode += (configuration.comments == true)
-				? " (Move up for initialization.)"
-				: "";
-		gCode += "\r\n";
-		gCode += "G00X" + configuration.xHome + "Y" + configuration.yHome;
-		gCode += (configuration.comments == true)
-				? " (Move to home position for initialization.)"
-				: "";
-		gCode += "\r\n";
+		gCode += gCodeColorStart(color, configuration);
 
 		/* Drawing instructions. */
 		for (Ellipse ellipse : list) {
@@ -247,33 +266,7 @@ class EllipseListChromosome extends AbstractListChromosome<Ellipse>
 				 */
 				color = ellipse.color;
 
-				if (configuration.comments == true) {
-					gCode += "(G Code instructions for "
-							+ String.format("%06X", color.getRGB() & 0xFFFFFF)
-							+ " color.)";
-					gCode += "\r\n";
-				}
-
-				gCode += "G90";
-				gCode += (configuration.comments == true)
-						? " (Switch to absolute coordinates.)"
-						: "";
-				gCode += (configuration.comments == true) ? "\r\n" : "";
-				gCode += "G21";
-				gCode += (configuration.comments == true)
-						? " (All units are in millimeters.)"
-						: "";
-				gCode += (configuration.comments == true) ? "\r\n" : " ";
-				gCode += "M3S" + configuration.zUp;
-				gCode += (configuration.comments == true)
-						? " (Move up for initialization.)"
-						: "";
-				gCode += "\r\n";
-				gCode += "G00X0Y0";
-				gCode += (configuration.comments == true)
-						? " (Move to home position for initialization.)"
-						: "";
-				gCode += "\r\n";
+				gCode += gCodeColorStart(color, configuration);
 			}
 
 			if (configuration.comments == true) {

@@ -106,40 +106,36 @@ class Ellipse implements Cloneable, GCode {
 		String refill = "";
 
 		for (int i = 0; i < configuration.penRefillCount; i++) {
-			refill += "M3S" + configuration.zDown;
+			refill += "M3";
 			refill += (configuration.comments == true)
 					? " (Pen move down.)"
 					: "";
 			refill += "\r\n";
-			refill += "M3S" + configuration.zUp;
+			refill += "G04P" + (configuration.penRefillTime + 0.5);
+			refill += (configuration.comments == true) ? " (Pause.)" : "";
+			refill += "\r\n";
+			refill += "M5";
 			refill += (configuration.comments == true) ? " (Pen move up.)" : "";
+			refill += "\r\n";
+			refill += "G04P" + (configuration.penRefillTime + 0.5);
+			refill += (configuration.comments == true) ? " (Pause.)" : "";
 			refill += "\r\n";
 		}
 
 		String gCode = "";
 
 		gCode += "G00X" + configuration.xHome + "Y" + configuration.yHome;
-
 		gCode += (configuration.comments == true)
 				? " (Move to home position.)"
 				: "";
-
-		gCode += (configuration.comments == true) ? "\r\n" : " ";
-
-		gCode += "M3S" + configuration.zUp;
-
-		gCode += (configuration.comments == true) ? " (Pen move up.)" : "";
-
 		gCode += "\r\n";
 
 		gCode += refill;
 
 		gCode += "G04P" + configuration.penRefillTime;
-
 		gCode += (configuration.comments == true)
 				? " (Paint refill timeout.)"
 				: "";
-
 		gCode += "\r\n";
 
 		gCode += "G00X"
@@ -147,17 +143,13 @@ class Ellipse implements Cloneable, GCode {
 						configuration.xOffset + x1 * configuration.scale, 2)
 				+ "Y" + Precision.round(
 						configuration.yOffset + y1 * configuration.scale, 2);
-
 		gCode += (configuration.comments == true)
 				? " (Move to first point position.)"
 				: "";
-
 		gCode += "\r\n";
 
-		gCode += "M3S" + configuration.zDown;
-
+		gCode += "M3";
 		gCode += (configuration.comments == true) ? " (Pen move down.)" : "";
-
 		gCode += "\r\n";
 
 		gCode += "G00X"
@@ -165,17 +157,13 @@ class Ellipse implements Cloneable, GCode {
 						configuration.xOffset + x2 * configuration.scale, 2)
 				+ "Y" + Precision.round(
 						configuration.yOffset + y2 * configuration.scale, 2);
-
 		gCode += (configuration.comments == true)
 				? " (Move to second point position.)"
 				: "";
-
 		gCode += "\r\n";
 
-		gCode += "M3S" + configuration.zUp;
-
+		gCode += "M5";
 		gCode += (configuration.comments == true) ? " (Pen move up.)" : "";
-
 		gCode += "\r\n";
 
 		return gCode.trim();
