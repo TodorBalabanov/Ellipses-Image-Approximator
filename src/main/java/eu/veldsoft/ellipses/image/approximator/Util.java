@@ -200,7 +200,11 @@ class Util {
 			Vector<Color> colors, boolean pixelClosestColor) {
 		Vector<Ellipse> ellipses = new Vector<Ellipse>();
 
-		for (int i = 0, x, y; i < EllipseListChromosome.AVERAGE_LENGTH(); i++) {
+		int size = (int) (PRNG.nextGaussian()
+				* EllipseListChromosome.LENGTH_SD()
+				+ EllipseListChromosome.LENGTH_MEAN());
+
+		for (int i = 0, x, y; i < size; i++) {
 			Color color = colors.elementAt(PRNG.nextInt(colors.size()));
 			x = PRNG.nextInt(image.getWidth());
 			y = PRNG.nextInt(image.getHeight());
@@ -243,10 +247,15 @@ class Util {
 			boolean pixelClosestColor, int populationSize, double elitismRate) {
 		List<Chromosome> list = new LinkedList<Chromosome>();
 		for (int i = 0; i < populationSize; i++) {
-			list.add(new EllipseListChromosome(
-					randomRepresentation(image, colors, pixelClosestColor,
-							EllipseListChromosome.AVERAGE_LENGTH()),
-					image, histogram, colors));
+			int size = (int) (PRNG.nextGaussian()
+					* EllipseListChromosome.LENGTH_SD()
+					+ EllipseListChromosome.LENGTH_MEAN());
+
+			list.add(
+					new EllipseListChromosome(
+							randomRepresentation(image, colors,
+									pixelClosestColor, size),
+							image, histogram, colors));
 		}
 		return new ElitisticListPopulation(list, list.size(), elitismRate);
 	}

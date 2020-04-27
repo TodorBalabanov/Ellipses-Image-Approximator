@@ -16,7 +16,13 @@ class EllipseListChromosome extends AbstractListChromosome<Ellipse>
 			GCode {
 
 	/** The amount of simple primitives can float, but it has average size. */
-	private static int AVERAGE_LENGTH = 0;
+	private static double LENGTH_MEAN = 0;
+
+	/**
+	 * The amount of simple primitives can float with standard deviation for
+	 * size.
+	 */
+	private static double LENGTH_SD = 0;
 
 	/** Reference to the original image. */
 	private static BufferedImage image = null;
@@ -30,20 +36,39 @@ class EllipseListChromosome extends AbstractListChromosome<Ellipse>
 	/**
 	 * @return The average length of the chromosome.
 	 */
-	public static int AVERAGE_LENGTH() {
-		return AVERAGE_LENGTH;
+	public static double LENGTH_MEAN() {
+		return LENGTH_MEAN;
 	}
 
 	/**
-	 * @param averageLength
+	 * @return The standard deviation for length of the chromosome.
+	 */
+	public static double LENGTH_SD() {
+		return LENGTH_SD;
+	}
+
+	/**
+	 * @param lengthMean
 	 *            The average length of the chromosome.
 	 */
-	public static void AVERAGE_LENGTH(int averageLength) {
-		if (averageLength < 0) {
-			averageLength = 0;
+	public static void LENGTH_MEAN(double lengthMean) {
+		if (lengthMean < 0) {
+			lengthMean = 0;
 		}
 
-		AVERAGE_LENGTH = averageLength;
+		LENGTH_MEAN = lengthMean;
+	}
+
+	/**
+	 * @param lengthSd
+	 *            The average length of the chromosome.
+	 */
+	public static void LENGTH_SD(double lengthSd) {
+		if (lengthSd < 0) {
+			lengthSd = 0;
+		}
+
+		LENGTH_SD = lengthSd;
 	}
 
 	public EllipseListChromosome(Ellipse[] representation, BufferedImage image,

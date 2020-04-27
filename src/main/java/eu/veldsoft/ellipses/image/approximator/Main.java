@@ -251,9 +251,14 @@ public class Main {
 				.desc("Genetic algorithm population size (default value 0).")
 				.build());
 
-		options.addOption(Option.builder("ga_chromosome_size").argName("number")
+		options.addOption(Option.builder("ga_chromosome_mean").argName("number")
 				.hasArg().valueSeparator()
 				.desc("Genetic algorithm chromosome average size (default value depends of the image size and ellipse size).")
+				.build());
+
+		options.addOption(Option.builder("ga_chromosome_sd").argName("number")
+				.hasArg().valueSeparator()
+				.desc("Genetic algorithm chromosome size standard deviation (default value 1.0).")
 				.build());
 
 		options.addOption(Option.builder("ga_tournament_arity")
@@ -420,13 +425,22 @@ public class Main {
 		}
 
 		/* Set chromosome average size for the genetic algorithm. */
-		int gaChromosomeAverageSize = (int) Math
+		int gaChromosomeSizeMean = (int) Math
 				.floor((original.getWidth() * original.getHeight())
 						/ (Math.PI * Ellipse.WIDTH() * Ellipse.HEIGHT() / 4D));
-		if (commands.hasOption("ga_chromosome_size") == true) {
-			gaChromosomeAverageSize = Integer
-					.valueOf(commands.getOptionValue("ga_chromosome_size"));
+		if (commands.hasOption("ga_chromosome_mean") == true) {
+			gaChromosomeSizeMean = Integer
+					.valueOf(commands.getOptionValue("ga_chromosome_mean"));
 		}
+		EllipseListChromosome.LENGTH_MEAN(gaChromosomeSizeMean);
+
+		/* Set chromosome size standard deviation for the genetic algorithm. */
+		double gaChromosomeSizeSd = 1;
+		if (commands.hasOption("ga_chromosome_sd") == true) {
+			gaChromosomeSizeSd = Double
+					.valueOf(commands.getOptionValue("ga_chromosome_sd"));
+		}
+		EllipseListChromosome.LENGTH_SD(gaChromosomeSizeSd);
 
 		/* Set genetic algorithm tournament selection arity. */
 		int gaTournamentArity = 2;
@@ -560,7 +574,6 @@ public class Main {
 					.valueOf(commands.getOptionValue("g_code_color_change"));
 		}
 
-		EllipseListChromosome.AVERAGE_LENGTH(gaChromosomeAverageSize);
 		Population initial = Util.randomInitialPopulation(original, histogram,
 				colors, pixelClosestColor, gaPopulationSize, gaElitismRate);
 		Population optimized = initial;
