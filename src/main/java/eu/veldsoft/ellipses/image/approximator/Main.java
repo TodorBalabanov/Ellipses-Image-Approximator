@@ -222,9 +222,14 @@ public class Main {
 				.hasArg().valueSeparator().desc("Z up value (default value 0).")
 				.build());
 
-		options.addOption(Option.builder("g_code_scaling").argName("number")
+		options.addOption(Option.builder("g_code_width").argName("number")
 				.hasArg().valueSeparator()
-				.desc("Scaling factor image pixels to drawing area millimeters (default value 1.0).")
+				.desc("Drawing canvas width in millimeters (default value 0.0).")
+				.build());
+
+		options.addOption(Option.builder("g_code_height").argName("number")
+				.hasArg().valueSeparator()
+				.desc("Drawing canvas height in millimeters (default value 0.0).")
 				.build());
 
 		options.addOption(Option.builder("g_code_refill").argName("number")
@@ -480,7 +485,7 @@ public class Main {
 		}
 
 		Settings settings = new GCode.Settings(false, 0, 0, 0, 0, 0, 0, 0.0,
-				0.0, 1, 0);
+				0.0, 0.0, 1, 0);
 
 		/* G Code comments switch on. */
 		if (commands.hasOption("g_code_comments") == true) {
@@ -523,10 +528,18 @@ public class Main {
 					.valueOf(commands.getOptionValue("g_code_z_up"));
 		}
 
-		/* Scaling factor between image size and painting area. */
-		if (commands.hasOption("g_code_scaling") == true) {
-			settings.scale = Double
-					.valueOf(commands.getOptionValue("g_code_scaling"));
+		/* Scaling factor between image width and canvas width. */
+		if (commands.hasOption("g_code_width") == true) {
+			settings.scaleWidth = Double
+					.valueOf(commands.getOptionValue("g_code_width"))
+					/ original.getWidth();
+		}
+
+		/* Scaling factor between image height and canvas height. */
+		if (commands.hasOption("g_code_height") == true) {
+			settings.scaleHeight = Double
+					.valueOf(commands.getOptionValue("g_code_height"))
+					/ original.getHeight();
 		}
 
 		/* Paint refill time in seconds. */

@@ -140,9 +140,9 @@ class Ellipse implements Cloneable, GCode {
 
 		gCode += "G00X"
 				+ Precision.round(
-						configuration.xOffset + x1 * configuration.scale, 2)
+						configuration.xOffset + x1 * configuration.scaleWidth, 2)
 				+ "Y" + Precision.round(
-						configuration.yOffset + y1 * configuration.scale, 2);
+						configuration.yOffset + y1 * configuration.scaleHeight, 2);
 		gCode += (configuration.comments == true)
 				? " (Move to first point position.)"
 				: "";
@@ -154,9 +154,9 @@ class Ellipse implements Cloneable, GCode {
 
 		gCode += "G00X"
 				+ Precision.round(
-						configuration.xOffset + x2 * configuration.scale, 2)
+						configuration.xOffset + x2 * configuration.scaleWidth, 2)
 				+ "Y" + Precision.round(
-						configuration.yOffset + y2 * configuration.scale, 2);
+						configuration.yOffset + y2 * configuration.scaleHeight, 2);
 		gCode += (configuration.comments == true)
 				? " (Move to second point position.)"
 				: "";

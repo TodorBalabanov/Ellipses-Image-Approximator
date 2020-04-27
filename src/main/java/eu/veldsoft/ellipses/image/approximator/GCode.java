@@ -25,7 +25,9 @@ interface GCode {
 		/** Z value in millimeters for the pen down state. */
 		double zUp;
 		/** Scaling factor for transformation from pixels to milliliters. */
-		double scale;
+		double scaleWidth;
+		/** Scaling factor for transformation from pixels to milliliters. */
+		double scaleHeight;
 		/** Paint refill time in seconds. */
 		double penRefillTime;
 		/** Paint refill number of times. */
@@ -50,8 +52,11 @@ interface GCode {
 		 *            Z value in millimeters for the pen up state.
 		 * @param zUp
 		 *            Z value in millimeters for the pen down state.
-		 * @param scale
-		 *            Scaling factor for transformation from pixels to
+		 * @param scaleWidth
+		 *            Width scaling factor for transformation from pixels to
+		 *            milliliters.
+		 * @param scaleHeight
+		 *            Height scaling factor for transformation from pixels to
 		 *            milliliters.
 		 * @param penRefillTime
 		 *            Paint refill time in seconds.
@@ -62,7 +67,7 @@ interface GCode {
 		 */
 		public Settings(boolean comments, double xHome, double yHome,
 				double xOffset, double yOffset, double zDown, double zUp,
-				double scale, double penRefillTime, int penRefillCount,
+				double scaleWidth, double scaleHeight, double penRefillTime, int penRefillCount,
 				double colorChangeTime) {
 			super();
 			this.comments = comments;
@@ -72,7 +77,8 @@ interface GCode {
 			this.yOffset = yOffset;
 			this.zDown = zDown;
 			this.zUp = zUp;
-			this.scale = scale;
+			this.scaleWidth = scaleWidth;
+			this.scaleHeight = scaleHeight;
 			this.penRefillTime = penRefillTime;
 			this.penRefillCount = penRefillCount;
 			this.colorChangeTime = colorChangeTime;
