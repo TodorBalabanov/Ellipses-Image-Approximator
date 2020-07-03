@@ -34,13 +34,12 @@ import ar.com.hjg.pngj.PngWriter;
 import ar.com.hjg.pngj.chunks.ChunkCopyBehaviour;
 
 class Util {
+	/** A pseudo-random number generator instance. */
+	private static final Random PRNG = new Random();
+
 	private static ColorComparator euclidean = new EuclideanColorComparator();
 
-	static final Random PRNG = new Random();
-
 	static int DEFAULT_THREAD_POOL_SIZE = 1;
-
-	static final ColorCoordinatesComparator usage = new ColorCoordinatesComparator();
 
 	static String log = "";
 
@@ -120,24 +119,6 @@ class Util {
 		if (file.indexOf(".svg") != -1) {
 			writeSvgSolution(width, height, list, fitness, file);
 		}
-	}
-
-	static double distance(BufferedImage a, BufferedImage b) {
-		int aPixels[] = a.getRGB(0, 0, a.getWidth(), a.getHeight(), null, 0,
-				a.getWidth());
-		int bPixels[] = b.getRGB(0, 0, b.getWidth(), b.getHeight(), null, 0,
-				b.getWidth());
-
-		int size = 0;
-		double sum = 0;
-		int length = (aPixels.length < bPixels.length)
-				? aPixels.length
-				: bPixels.length;
-		for (size = 0; size < length; size++) {
-			sum += euclidean.distance(aPixels[size], bPixels[size]);
-		}
-
-		return sum / size;
 	}
 
 	static Color closestColor(int rgb, Vector<Color> colors) {

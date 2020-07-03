@@ -10,12 +10,16 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Random;
 import java.util.Vector;
 
 import javax.imageio.ImageIO;
 
 class Population1 {
-	Chromosome1 best = null;
+	private static final Random PRNG = new Random();
+
+	private static final ImageComparator IMAGE_COMPARATOR = new EuclideanImageComparator();
+
 	private Chromosome1 first = null;
 	private Chromosome1 second = null;
 	private Chromosome1 offspring = null;
@@ -24,6 +28,8 @@ class Population1 {
 	private BufferedImage image = null;
 	private BufferedImage experimental = null;
 	private boolean colorsEvolution = false;
+
+	Chromosome1 best = null;
 
 	public Population1(Population1 population) {
 		super();
@@ -81,14 +87,14 @@ class Population1 {
 
 	void select() {
 		do {
-			first = chromosomes.get(Util.PRNG.nextInt(chromosomes.size()));
-			second = chromosomes.get(Util.PRNG.nextInt(chromosomes.size()));
-			result = chromosomes.get(Util.PRNG.nextInt(chromosomes.size()));
+			first = chromosomes.get(PRNG.nextInt(chromosomes.size()));
+			second = chromosomes.get(PRNG.nextInt(chromosomes.size()));
+			result = chromosomes.get(PRNG.nextInt(chromosomes.size()));
 
 			/*
 			 * Selection of better parents.
 			 */
-			double level = Util.PRNG.nextDouble();
+			double level = PRNG.nextDouble();
 			if (level > 0.95) {
 				if (result.fittnes > first.fittnes) {
 					Chromosome1 buffer = result;
@@ -136,10 +142,9 @@ class Population1 {
 		/*
 		 * Crossover probability.
 		 */
-		if (Util.PRNG.nextDouble() > 0.96) {
+		if (PRNG.nextDouble() > 0.96) {
 			do {
-				offspring = chromosomes
-						.get(Util.PRNG.nextInt(chromosomes.size()));
+				offspring = chromosomes.get(PRNG.nextInt(chromosomes.size()));
 			} while (offspring == best);
 			return;
 		}
@@ -149,7 +154,7 @@ class Population1 {
 
 		for (int i = 0; i < first.colors.size()
 				&& i < second.colors.size(); i++) {
-			if (Util.PRNG.nextBoolean()) {
+			if (PRNG.nextBoolean()) {
 				offspring.colors.add(first.colors.elementAt(i));
 			} else {
 				offspring.colors.add(second.colors.elementAt(i));
@@ -157,13 +162,13 @@ class Population1 {
 		}
 
 		for (Ellipse e : first.ellipses) {
-			if (Util.PRNG.nextBoolean() == true) {
+			if (PRNG.nextBoolean() == true) {
 				offspring.ellipses.add(new Ellipse(e));
 			}
 		}
 
 		for (Ellipse e : second.ellipses) {
-			if (Util.PRNG.nextBoolean() == true) {
+			if (PRNG.nextBoolean() == true) {
 				offspring.ellipses.add(new Ellipse(e));
 			}
 		}
@@ -173,41 +178,40 @@ class Population1 {
 		/*
 		 * Mutation probability.
 		 */
-		if (Util.PRNG.nextDouble() > 0.01) {
+		if (PRNG.nextDouble() > 0.01) {
 			return;
 		}
 
 		if (colorsEvolution == true) {
-			offspring.colors.setElementAt(
-					new Color(Util.PRNG.nextInt(0x1000000)),
-					Util.PRNG.nextInt(offspring.colors.size()));
+			offspring.colors.setElementAt(new Color(PRNG.nextInt(0x1000000)),
+					PRNG.nextInt(offspring.colors.size()));
 		}
 
-		double factor = Util.PRNG.nextDouble();
+		double factor = PRNG.nextDouble();
 		Ellipse ellipse = offspring.ellipses
-				.get(Util.PRNG.nextInt(offspring.ellipses.size()));
+				.get(PRNG.nextInt(offspring.ellipses.size()));
 
 		int dx = (int) (ellipse.WIDTH() * factor);
 		int dy = (int) (ellipse.HEIGHT() * factor);
-		double theta = 2 * Math.PI * Util.PRNG.nextDouble();
+		double theta = 2 * Math.PI * PRNG.nextDouble();
 
 		/*
 		 * Mutate color in some cases by taking color of other ellipse.
 		 */
-		if (Util.PRNG.nextDouble() < factor) {
+		if (PRNG.nextDouble() < factor) {
 			ellipse.color = offspring.ellipses
-					.get(Util.PRNG.nextInt(offspring.ellipses.size())).color;
+					.get(PRNG.nextInt(offspring.ellipses.size())).color;
 		}
 
 		/*
 		 * Mutate positions.
 		 */
-		if (Util.PRNG.nextBoolean() == true) {
+		if (PRNG.nextBoolean() == true) {
 			ellipse.x1 -= dx;
 		} else {
 			ellipse.x1 += dx;
 		}
-		if (Util.PRNG.nextBoolean() == true) {
+		if (PRNG.nextBoolean() == true) {
 			ellipse.y1 -= dy;
 		} else {
 			ellipse.y1 += dy;
@@ -282,7 +286,7 @@ class Population1 {
 		// TODO Number of ellipses and images distance can be used with some
 		// coefficients.
 		double size = offspring.ellipses.size();
-		double distance = Util.distance(image, experimental);
+		double distance = IMAGE_COMPARATOR.distance(image, experimental);
 		double alpha = Util.alphaLevel(experimental, offspring.colors);
 		offspring.fittnes = 0.1D * size + 0.6D * distance * distance * distance
 				+ 0.3D * alpha * alpha;

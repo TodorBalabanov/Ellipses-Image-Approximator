@@ -67,8 +67,8 @@ interface GCode {
 		 */
 		public Settings(boolean comments, double xHome, double yHome,
 				double xOffset, double yOffset, double zDown, double zUp,
-				double scaleWidth, double scaleHeight, double penRefillTime, int penRefillCount,
-				double colorChangeTime) {
+				double scaleWidth, double scaleHeight, double penRefillTime,
+				int penRefillCount, double colorChangeTime) {
 			super();
 			this.comments = comments;
 			this.xHome = xHome;

@@ -2,6 +2,7 @@ package eu.veldsoft.ellipses.image.approximator;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 
 import org.apache.commons.math3.exception.MathIllegalArgumentException;
 import org.apache.commons.math3.genetics.Chromosome;
@@ -9,6 +10,9 @@ import org.apache.commons.math3.genetics.ChromosomePair;
 import org.apache.commons.math3.genetics.CrossoverPolicy;
 
 class InstructionsCrossover implements CrossoverPolicy {
+	/** A pseudo-random number generator instance. */
+	private static final Random PRNG = new Random();
+
 	@Override
 	public ChromosomePair crossover(final Chromosome first,
 			final Chromosome second) throws MathIllegalArgumentException {
@@ -29,23 +33,23 @@ class InstructionsCrossover implements CrossoverPolicy {
 		final List<Ellipse> child2 = new ArrayList<Ellipse>();
 
 		for (Ellipse ellipse : parent1) {
-			if (Util.PRNG.nextBoolean() == true) {
+			if (PRNG.nextBoolean() == true) {
 				child1.add(ellipse);
 			}
 		}
 		for (Ellipse ellipse : parent2) {
-			if (Util.PRNG.nextBoolean() == true) {
+			if (PRNG.nextBoolean() == true) {
 				child1.add(ellipse);
 			}
 		}
 
 		for (Ellipse ellipse : parent1) {
-			if (Util.PRNG.nextBoolean() == true) {
+			if (PRNG.nextBoolean() == true) {
 				child2.add(ellipse);
 			}
 		}
 		for (Ellipse ellipse : parent2) {
-			if (Util.PRNG.nextBoolean() == true) {
+			if (PRNG.nextBoolean() == true) {
 				child2.add(ellipse);
 			}
 		}

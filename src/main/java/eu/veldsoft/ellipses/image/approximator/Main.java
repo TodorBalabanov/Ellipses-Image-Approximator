@@ -379,7 +379,8 @@ public class Main {
 						histogram.get(color.toString()) + 1);
 			}
 		}
-		Util.usage.setHistogram(histogram);
+		EllipseListChromosome.COORDINATES_COLOR_COMPARATOR()
+				.setHistogram(histogram);
 
 		/* Associate output folder. */
 		File output = null;

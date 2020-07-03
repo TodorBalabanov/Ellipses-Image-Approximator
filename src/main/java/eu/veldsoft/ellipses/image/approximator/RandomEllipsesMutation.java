@@ -5,12 +5,16 @@ import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Random;
 import java.util.Vector;
 
 import org.apache.commons.math3.genetics.Chromosome;
 import org.apache.commons.math3.genetics.MutationPolicy;
 
 class RandomEllipsesMutation implements MutationPolicy {
+	/** A pseudo-random number generator instance. */
+	private static final Random PRNG = new Random();
+
 	private static BufferedImage image = null;
 	private static Map<String, Integer> histogram = null;
 	private static Vector<Color> colors = null;
@@ -28,20 +32,20 @@ class RandomEllipsesMutation implements MutationPolicy {
 			throw new IllegalArgumentException();
 		}
 
-		double factor = Util.PRNG.nextDouble();
+		double factor = PRNG.nextDouble();
 
 		List<Ellipse> values = new ArrayList<Ellipse>();
 		for (Ellipse value : ((EllipseListChromosome) original).getEllipses()) {
 			int dx = (int) (Ellipse.WIDTH() * factor);
 			int dy = (int) (Ellipse.HEIGHT() * factor);
-			double theta = 2 * Math.PI * Util.PRNG.nextDouble();
+			double theta = 2 * Math.PI * PRNG.nextDouble();
 
 			Ellipse ellipse = new Ellipse(value);
 
 			/*
 			 * Mutate color in some cases by taking color of other ellipse.
 			 */
-			if (Util.PRNG.nextDouble() < factor) {
+			if (PRNG.nextDouble() < factor) {
 				ellipse.color = ((EllipseListChromosome) original)
 						.getRandomElement().color;
 			}
@@ -49,12 +53,12 @@ class RandomEllipsesMutation implements MutationPolicy {
 			/*
 			 * Mutate positions.
 			 */
-			if (Util.PRNG.nextBoolean() == true) {
+			if (PRNG.nextBoolean() == true) {
 				ellipse.x1 -= dx;
 			} else {
 				ellipse.x1 += dx;
 			}
-			if (Util.PRNG.nextBoolean() == true) {
+			if (PRNG.nextBoolean() == true) {
 				ellipse.y1 -= dy;
 			} else {
 				ellipse.y1 += dy;

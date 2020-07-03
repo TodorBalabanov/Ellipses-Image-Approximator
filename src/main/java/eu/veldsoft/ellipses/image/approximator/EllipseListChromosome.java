@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.Random;
 import java.util.Vector;
 
 import org.apache.commons.math3.genetics.AbstractListChromosome;
@@ -14,6 +15,17 @@ import org.apache.commons.math3.genetics.InvalidRepresentationException;
 class EllipseListChromosome extends AbstractListChromosome<Ellipse>
 		implements
 			GCode {
+	/** A pseudo-random number generator instance. */
+	private static final Random PRNG = new Random();
+
+	/**
+	 * Image comparator instance.
+	 */
+	private static final ImageComparator IMAGE_COMPARATOR = new HierarchicalProbabilisticImageComparator(
+			10, 0.05);
+
+	/** Color comparator on coordinates instance. */
+	private static final ColorCoordinatesComparator COORDINATES_COLOR_COMPARATOR = new ColorCoordinatesComparator();
 
 	/** The amount of simple primitives can float, but it has average size. */
 	private static double LENGTH_MEAN = 0;
@@ -32,6 +44,15 @@ class EllipseListChromosome extends AbstractListChromosome<Ellipse>
 
 	/** Reference to the set of reduced colors. */
 	private static Vector<Color> colors = null;
+
+	/**
+	 * Coordinates color comparator reference getter.
+	 * 
+	 * @return Reference to the comparator.
+	 */
+	public static ColorCoordinatesComparator COORDINATES_COLOR_COMPARATOR() {
+		return COORDINATES_COLOR_COMPARATOR;
+	}
 
 	/**
 	 * @return The average length of the chromosome.
@@ -125,7 +146,7 @@ class EllipseListChromosome extends AbstractListChromosome<Ellipse>
 		double disproportion = Math.abs((getRepresentation().size() * Math.PI
 				* Ellipse.WIDTH() * Ellipse.HEIGHT() / 4D)
 				- (image.getWidth() * image.getHeight()));
-		double distance = Util.distance(image, experimental);
+		double distance = IMAGE_COMPARATOR.distance(image, experimental);
 		double alpha = 1 + Util.alphaLevel(experimental, colors);
 
 		/*
@@ -157,14 +178,14 @@ class EllipseListChromosome extends AbstractListChromosome<Ellipse>
 		/* Put all coordinates inside image dimensions. */
 		for (Ellipse ellipse : list) {
 			if (ellipse.x1 < 0 || ellipse.x2 < 0) {
-				int dx = 1 + Util.PRNG.nextInt(image.getWidth() / 2);
+				int dx = 1 + PRNG.nextInt(image.getWidth() / 2);
 
 				ellipse.x1 += dx;
 				ellipse.x2 += dx;
 			}
 
 			if (ellipse.y1 < 0 || ellipse.y2 < 0) {
-				int dy = 1 + Util.PRNG.nextInt(image.getHeight() / 2);
+				int dy = 1 + PRNG.nextInt(image.getHeight() / 2);
 
 				ellipse.y1 += dy;
 				ellipse.y2 += dy;
@@ -172,7 +193,7 @@ class EllipseListChromosome extends AbstractListChromosome<Ellipse>
 
 			if (ellipse.x1 >= image.getWidth()
 					|| ellipse.x2 >= image.getWidth()) {
-				int dx = 1 + Util.PRNG.nextInt(image.getWidth() / 2);
+				int dx = 1 + PRNG.nextInt(image.getWidth() / 2);
 
 				ellipse.x1 -= dx;
 				ellipse.x2 -= dx;
@@ -180,7 +201,7 @@ class EllipseListChromosome extends AbstractListChromosome<Ellipse>
 
 			if (ellipse.y1 >= image.getHeight()
 					|| ellipse.y2 >= image.getHeight()) {
-				int dy = 1 + Util.PRNG.nextInt(image.getHeight() / 2);
+				int dy = 1 + PRNG.nextInt(image.getHeight() / 2);
 
 				ellipse.y1 -= dy;
 				ellipse.y2 -= dy;
@@ -200,7 +221,7 @@ class EllipseListChromosome extends AbstractListChromosome<Ellipse>
 
 	public Ellipse getRandomElement() {
 		return getRepresentation()
-				.get(Util.PRNG.nextInt(getRepresentation().size()));
+				.get(PRNG.nextInt(getRepresentation().size()));
 	}
 
 	private String gCodeColorStart(Color color, Settings configuration) {
@@ -254,7 +275,7 @@ class EllipseListChromosome extends AbstractListChromosome<Ellipse>
 
 		/* Sorting by colors is important for the plotting order. */
 		List<Ellipse> list = new ArrayList<Ellipse>(getEllipses());
-		Collections.sort(list, Util.usage);
+		Collections.sort(list, COORDINATES_COLOR_COMPARATOR);
 		if (list.size() == 0) {
 			return gCode;
 		}
