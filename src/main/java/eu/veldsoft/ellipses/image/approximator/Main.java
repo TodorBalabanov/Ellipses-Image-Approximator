@@ -172,7 +172,7 @@ public class Main {
 
 		options.addOption(Option.builder("hierarchy_depth").argName("number")
 				.hasArg().valueSeparator()
-				.desc("Hierarchical depth in probabilistic Euclidean distance (default value 1).")
+				.desc("Hierarchical depth in probabilistic Euclidean distance (default value 10).")
 				.build());
 
 		options.addOption(Option.builder("sample_size").argName("number")
@@ -351,7 +351,7 @@ public class Main {
 		}
 
 		/* Probabilistic Euclidean distance recursive depth. */
-		int recursionDepth = 1;
+		int recursionDepth = 10;
 		if (commands.hasOption("hierarchy_depth") == true) {
 			sampleSize = Integer
 					.valueOf(commands.getOptionValue("hierarchy_depth"));

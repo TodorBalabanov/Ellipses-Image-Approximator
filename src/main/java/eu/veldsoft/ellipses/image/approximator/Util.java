@@ -145,10 +145,10 @@ class Util {
 	}
 
 	static double alphaLevel(BufferedImage image, Vector<Color> colors) {
-		int level = 0;
-
 		int pixels[] = image.getRGB(0, 0, image.getWidth(), image.getHeight(),
 				null, 0, image.getWidth());
+		
+		int level = 0;
 		for (int i = 0; i < pixels.length; i++) {
 			if (pixels[i] == 0x01FFFFFF) {
 				level++;
@@ -179,27 +179,12 @@ class Util {
 
 	static Vector<Ellipse> randomApproximatedEllipses(BufferedImage image,
 			Vector<Color> colors, boolean pixelClosestColor) {
-		Vector<Ellipse> ellipses = new Vector<Ellipse>();
-
-		int size = (int) (PRNG.nextGaussian()
+		int length = (int) (PRNG.nextGaussian()
 				* EllipseListChromosome.LENGTH_SD()
 				+ EllipseListChromosome.LENGTH_MEAN());
 
-		for (int i = 0, x, y; i < size; i++) {
-			Color color = colors.elementAt(PRNG.nextInt(colors.size()));
-			x = PRNG.nextInt(image.getWidth());
-			y = PRNG.nextInt(image.getHeight());
-
-			if (pixelClosestColor == true) {
-				color = closestColor(image.getRGB(x, y), colors);
-			}
-
-			double theta = 2.0D * Math.PI * PRNG.nextDouble();
-
-			ellipses.add(new Ellipse(x, y, theta, color));
-		}
-
-		return ellipses;
+		return new Vector<Ellipse>(
+				randomRepresentation(image, colors, pixelClosestColor, length));
 	}
 
 	static List<Ellipse> randomRepresentation(BufferedImage image,
