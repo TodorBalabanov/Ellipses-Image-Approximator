@@ -21,7 +21,7 @@ class EllipseListChromosome extends AbstractListChromosome<Ellipse>
 	/**
 	 * Image comparator instance.
 	 */
-	private static final ImageComparator IMAGE_COMPARATOR = new HierarchicalProbabilisticImageComparator(
+	private static ImageComparator IMAGE_COMPARATOR = new HierarchicalProbabilisticImageComparator(
 			10, 0.05);
 
 	/** Color comparator on coordinates instance. */
@@ -44,6 +44,16 @@ class EllipseListChromosome extends AbstractListChromosome<Ellipse>
 
 	/** Reference to the set of reduced colors. */
 	private static Vector<Color> colors = null;
+
+	/**
+	 * Image comparator setter;
+	 * 
+	 * @param iMAGE_COMPARATOR
+	 *            the iMAGE_COMPARATOR to set
+	 */
+	public static void IMAGE_COMPARATOR(ImageComparator comparator) {
+		IMAGE_COMPARATOR = comparator;
+	}
 
 	/**
 	 * Coordinates color comparator reference getter.

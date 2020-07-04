@@ -164,6 +164,22 @@ public class Main {
 		options.addOption(new Option("aco", false,
 				"Switch on ant colony optimization (default value off)."));
 
+		options.addOption(new Option("euclidean", false,
+				"Use of Euclidean distance for image similarity estimation (default value off)."));
+
+		options.addOption(new Option("probabilistic", false,
+				"Use of hierarchical probabilistic Euclidean distance for image similarity estimation (default value on)."));
+
+		options.addOption(Option.builder("hierarchy_depth").argName("number")
+				.hasArg().valueSeparator()
+				.desc("Hierarchical depth in probabilistic Euclidean distance (default value 1).")
+				.build());
+
+		options.addOption(Option.builder("sample_size").argName("number")
+				.hasArg().valueSeparator()
+				.desc("Sample size percent (from 0.0 to 1.0) in probabilistic Euclidean distance (default value 0.05).")
+				.build());
+
 		options.addOption(new Option("g_code_print", false,
 				"Switch on G Code generation (default value off)."));
 
@@ -326,6 +342,35 @@ public class Main {
 		boolean useAntColonyOptimization = false;
 		if (commands.hasOption("aco") == true) {
 			useAntColonyOptimization = true;
+		}
+
+		/* Probabilistic Euclidean distance sample size. */
+		double sampleSize = 0.05;
+		if (commands.hasOption("sample_size") == true) {
+			sampleSize = Double.valueOf(commands.getOptionValue("sample_size"));
+		}
+
+		/* Probabilistic Euclidean distance recursive depth. */
+		int recursionDepth = 1;
+		if (commands.hasOption("hierarchy_depth") == true) {
+			sampleSize = Integer
+					.valueOf(commands.getOptionValue("hierarchy_depth"));
+		}
+
+		/*
+		 * Switch on hierarchical probabilistic Euclidean distance for image
+		 * similarity.
+		 */
+		if (commands.hasOption("probabilistic") == true) {
+			EllipseListChromosome.IMAGE_COMPARATOR(
+					new HierarchicalProbabilisticImageComparator(recursionDepth,
+							sampleSize));
+		}
+
+		/* Switch on Euclidean distance for image similarity. */
+		if (commands.hasOption("euclidean") == true) {
+			EllipseListChromosome
+					.IMAGE_COMPARATOR(new EuclideanImageComparator());
 		}
 
 		/* Switch on ant colony optimization. */
