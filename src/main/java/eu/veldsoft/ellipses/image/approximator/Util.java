@@ -43,6 +43,61 @@ class Util {
 
 	static String log = "";
 
+	private static Ellipse findBetter(int x, int y, BufferedImage image,
+			double theta, Color color) {
+		int width = Math.max(Ellipse.WIDTH(), Ellipse.HEIGHT());
+		int height = Math.max(Ellipse.WIDTH(), Ellipse.HEIGHT());
+		int left = x - width / 2;
+		int top = y - height / 2;
+
+		if (left < 0) {
+			left = 0;
+		}
+
+		if (top < 0) {
+			top = 0;
+		}
+
+		if (left + width >= image.getWidth()) {
+			left = image.getWidth() - width;
+		}
+
+		if (top + height >= image.getHeight()) {
+			top = image.getHeight() - height;
+		}
+
+		final ImageComparator comparator = new EuclideanImageComparator();
+		final BufferedImage squeare = image.getSubimage(left, top, width,
+				height);
+
+		BufferedImage attempt = new BufferedImage(squeare.getWidth(),
+				squeare.getHeight(), BufferedImage.TYPE_INT_ARGB);
+		List<Ellipse> list = new ArrayList<Ellipse>();
+		list.add(new Ellipse(width / 2, height / 2, theta, color));
+
+		attempt = drawEllipses(attempt, list);
+
+		double better = Double.MAX_VALUE;
+		double distance = comparator.distance(squeare, attempt);
+
+		while (distance < better) {
+			better = distance;
+
+			theta = 2.0D * Math.PI * PRNG.nextDouble();
+
+			list.clear();
+			list.add(new Ellipse(width / 2, height / 2, theta, color));
+			attempt = new BufferedImage(squeare.getWidth(), squeare.getHeight(),
+					BufferedImage.TYPE_INT_ARGB);
+
+			attempt = drawEllipses(attempt, list);
+
+			distance = comparator.distance(squeare, attempt);
+		}
+
+		return new Ellipse(x, y, theta, color);
+	}
+
 	static private void writePngSolution(int width, int height,
 			List<Ellipse> list, double fitness, String file) {
 		ByteArrayOutputStream os = null;
@@ -147,7 +202,7 @@ class Util {
 	static double alphaLevel(BufferedImage image, Vector<Color> colors) {
 		int pixels[] = image.getRGB(0, 0, image.getWidth(), image.getHeight(),
 				null, 0, image.getWidth());
-		
+
 		int level = 0;
 		for (int i = 0; i < pixels.length; i++) {
 			if (pixels[i] == 0x01FFFFFF) {
@@ -178,31 +233,38 @@ class Util {
 	}
 
 	static Vector<Ellipse> randomApproximatedEllipses(BufferedImage image,
-			Vector<Color> colors, boolean pixelClosestColor) {
+			Vector<Color> colors, boolean pixelClosestColor,
+			boolean localSearch) {
 		int length = (int) (PRNG.nextGaussian()
 				* EllipseListChromosome.LENGTH_SD()
 				+ EllipseListChromosome.LENGTH_MEAN());
 
-		return new Vector<Ellipse>(
-				randomRepresentation(image, colors, pixelClosestColor, length));
+		return new Vector<Ellipse>(randomRepresentation(image, colors,
+				pixelClosestColor, localSearch, length));
 	}
 
 	static List<Ellipse> randomRepresentation(BufferedImage image,
-			Vector<Color> colors, boolean pixelClosestColor, int length) {
+			Vector<Color> colors, boolean pixelClosestColor,
+			boolean localSearch, int length) {
 		List<Ellipse> random = new ArrayList<Ellipse>();
 
 		for (int i = 0, x, y; i < length; i++) {
-			Color color = colors.elementAt(PRNG.nextInt(colors.size()));
 			x = PRNG.nextInt(image.getWidth());
 			y = PRNG.nextInt(image.getHeight());
 
+			double theta = 2.0D * Math.PI * PRNG.nextDouble();
+
+			Color color = colors.elementAt(PRNG.nextInt(colors.size()));
 			if (pixelClosestColor == true) {
 				color = closestColor(image.getRGB(x, y), colors);
 			}
 
-			double theta = 2.0D * Math.PI * PRNG.nextDouble();
-
-			random.add(new Ellipse(x, y, theta, color));
+			/* Implement a local search for a better orientation angle. */
+			if (localSearch == true) {
+				random.add(findBetter(x, y, image, theta, color));
+			} else {
+				random.add(new Ellipse(x, y, theta, color));
+			}
 		}
 
 		return random;
@@ -210,7 +272,8 @@ class Util {
 
 	static Population randomInitialPopulation(BufferedImage image,
 			Map<String, Integer> histogram, Vector<Color> colors,
-			boolean pixelClosestColor, int populationSize, double elitismRate) {
+			boolean pixelClosestColor, boolean localSearch, int populationSize,
+			double elitismRate) {
 		List<Chromosome> list = new LinkedList<Chromosome>();
 		for (int i = 0; i < populationSize; i++) {
 			int size = (int) (PRNG.nextGaussian()
@@ -220,7 +283,7 @@ class Util {
 			list.add(
 					new EllipseListChromosome(
 							randomRepresentation(image, colors,
-									pixelClosestColor, size),
+									pixelClosestColor, localSearch, size),
 							image, histogram, colors));
 		}
 		return new ElitisticListPopulation(list, list.size(), elitismRate);

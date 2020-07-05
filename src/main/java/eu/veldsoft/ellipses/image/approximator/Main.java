@@ -158,6 +158,9 @@ public class Main {
 		options.addOption(new Option("pixel_closest_color", false,
 				"Use RGB values of the pixels to match the best color from the set during the initialization of the population (default value false)."));
 
+		options.addOption(new Option("orientation_local_search", false,
+				"Application of a local search for a better initial orientation of the ellipses (default value false)."));
+
 		options.addOption(new Option("ga", false,
 				"Switch on genetic algorithm optimization (default value off)."));
 
@@ -299,7 +302,7 @@ public class Main {
 
 		options.addOption(Option.builder("ga_optimization_time")
 				.argName("number").hasArg().valueSeparator()
-				.desc("Genetic algorithm optimization time in seconds (default value 0).")
+				.desc("Genetic algorithm optimization time in seconds (default value 0). If a suffix is used 1h is one hour, 1m is one minute, 1s is one second, and 1ms is one millisecond.")
 				.build());
 
 		options.addOption(Option.builder("aco_ants_amount").argName("number")
@@ -353,7 +356,7 @@ public class Main {
 		/* Probabilistic Euclidean distance recursive depth. */
 		int recursionDepth = 10;
 		if (commands.hasOption("hierarchy_depth") == true) {
-			sampleSize = Integer
+			recursionDepth = Integer
 					.valueOf(commands.getOptionValue("hierarchy_depth"));
 		}
 
@@ -463,6 +466,15 @@ public class Main {
 			pixelClosestColor = true;
 		}
 
+		/*
+		 * Application of local search for a better initial orientation of the
+		 * ellipse.
+		 */
+		boolean orientationLocalSearch = false;
+		if (commands.hasOption("orientation_local_search") == true) {
+			orientationLocalSearch = true;
+		}
+
 		/* Set population size for the genetic algorithm. */
 		int gaPopulationSize = 0;
 		if (commands.hasOption("ga_population_size") == true) {
@@ -516,11 +528,27 @@ public class Main {
 					.valueOf(commands.getOptionValue("ga_elitism_rate"));
 		}
 
-		/* Set genetic algorithm optimization time. */
+		/* Set genetic algorithm optimization time in seconds. */
 		int gaOptimizationTime = 0;
 		if (commands.hasOption("ga_optimization_time") == true) {
-			gaOptimizationTime = Integer
-					.valueOf(commands.getOptionValue("ga_optimization_time"));
+			double multiplier = 1;
+			String value = commands.getOptionValue("ga_optimization_time");
+
+			if (value.contains("ms") == true) {
+				multiplier = 0.001;
+				value = value.replace("ms", "");
+			} else if (value.contains("s") == true) {
+				multiplier = 1.0;
+				value = value.replace("s", "");
+			} else if (value.contains("m") == true) {
+				multiplier = 60;
+				value = value.replace("m", "");
+			} else if (value.contains("h") == true) {
+				multiplier = 360;
+				value = value.replace("h", "");
+			}
+
+			gaOptimizationTime = (int) (Integer.valueOf(value) * multiplier);
 		}
 
 		/* Number of ants in the graph. */
@@ -621,7 +649,8 @@ public class Main {
 		}
 
 		Population initial = Util.randomInitialPopulation(original, histogram,
-				colors, pixelClosestColor, gaPopulationSize, gaElitismRate);
+				colors, pixelClosestColor, orientationLocalSearch,
+				gaPopulationSize, gaElitismRate);
 		Population optimized = initial;
 
 		/*

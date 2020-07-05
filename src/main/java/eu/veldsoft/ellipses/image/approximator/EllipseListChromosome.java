@@ -171,7 +171,10 @@ class EllipseListChromosome extends AbstractListChromosome<Ellipse>
 		 * 
 		 * return -alpha;
 		 */
-		return -(alpha * distance * disproportion);
+		return -(alpha + distance + disproportion);
+		// return -disproportion;
+		// return -distance;
+		// return -alpha;
 	}
 
 	@Override

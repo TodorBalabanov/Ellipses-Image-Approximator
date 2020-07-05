@@ -81,6 +81,16 @@ class HierarchicalProbabilisticImageComparator implements ImageComparator {
 		 */
 		int sampleSize = (int) ((maxX - minX) * (maxY - minY) * samplePercent);
 
+		/* Is sample size is zero the distance is accepted zero. */
+		if (sampleSize <= 0) {
+			return 0;
+		}
+
+		/* The sample should be a smaller part of the image. */
+		if (sampleSize >= (maxX - minX) * (maxY - minY)) {
+			throw new RuntimeException( "It is not allowed the sample size to be bigger than the population size!" );
+		}
+		
 		/* Generate unique indices of pixels with the size of the sample. */
 		Set<Integer> indices = new HashSet<Integer>();
 		while (indices.size() < sampleSize) {

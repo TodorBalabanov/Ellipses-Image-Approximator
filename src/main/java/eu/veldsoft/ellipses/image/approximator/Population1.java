@@ -49,7 +49,8 @@ class Population1 {
 	}
 
 	public Population1(int size, BufferedImage image, Vector<Color> colors,
-			boolean pixelClosestColor, boolean colorsEvolution) {
+			boolean pixelClosestColor, boolean localSearch,
+			boolean colorsEvolution) {
 		super();
 
 		this.image = image;
@@ -65,8 +66,10 @@ class Population1 {
 		 * Generate random population and evaluate chromosomes in it.
 		 */
 		for (int i = 0; i < size; i++) {
-			offspring = new Chromosome1(colors, Util.randomApproximatedEllipses(
-					image, colors, pixelClosestColor), Double.MAX_VALUE);
+			offspring = new Chromosome1(colors,
+					Util.randomApproximatedEllipses(image, colors,
+							pixelClosestColor, localSearch),
+					Double.MAX_VALUE);
 			evaluate();
 			chromosomes.addElement(offspring);
 		}
